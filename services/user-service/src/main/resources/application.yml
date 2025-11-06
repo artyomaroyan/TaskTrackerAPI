@@ -6,3 +6,4 @@ spring:
     jwt:
       key-siz: 2048
       algorithm: RSA
+      expiration: 3600
