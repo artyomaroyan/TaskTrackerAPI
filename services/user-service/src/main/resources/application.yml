@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: user-service
+
+  security:
+    jwt:
+      key-siz: 2048
+      algorithm: RSA
