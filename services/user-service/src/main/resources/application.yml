@@ -2,8 +2,15 @@ spring:
   application:
     name: user-service
 
+  r2dbc:
+    url: r2dbc:/postgresql://${DB_URL}:${DB_PORT}:/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    properties:
+      show-sql: true
+
   security:
     jwt:
-      key-siz: 2048
-      algorithm: RSA
-      expiration: 3600
+      issuer: ${ASYMMETRIC_JWT_ISSUER}
+      algorithm: ${ASYMMETRIC_JWT_KEY_ALGORITHM}
+      expiration: ${ASYMMETRIC_JWT_KEY_EXPIRATION}
