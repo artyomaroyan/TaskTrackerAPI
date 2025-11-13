@@ -1,16 +1,22 @@
 spring:
   application:
     name: user-service
+  config:
+    import: optional:file:.env[.properties]
+  profiles:
+    active: local
 
   r2dbc:
-    url: r2dbc:/postgresql://${DB_URL}:${DB_PORT}:/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: r2dbc:postgresql://${DB_URL:localhost}:${DB_PORT:5432}/${DB_NAME:task_tracker_users_db}
+    username: ${DB_USERNAME:task_tracker_api_owner}
+    password: ${DB_PASSWORD:qwerty_12345}
     properties:
       show-sql: true
 
   security:
     jwt:
-      issuer: ${ASYMMETRIC_JWT_ISSUER}
-      algorithm: ${ASYMMETRIC_JWT_KEY_ALGORITHM}
-      expiration: ${ASYMMETRIC_JWT_KEY_EXPIRATION}
+      issuer: ${ASYMMETRIC_JWT_ISSUER:task_tracker_api_token_issuer}
+      expiration: ${ASYMMETRIC_JWT_KEY_EXPIRATION:3600}
+
+server:
+  port: 8081
