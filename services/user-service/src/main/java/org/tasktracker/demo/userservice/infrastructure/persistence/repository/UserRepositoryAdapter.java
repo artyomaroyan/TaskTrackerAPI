@@ -40,6 +40,11 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public Mono<Boolean> existsByUsername(String username) {
+        return reactiveRepository.existsByUsername(username);
+    }
+
+    @Override
     public Mono<Void> delete(UUID id) {
         return reactiveRepository.deleteById(id);
     }
@@ -47,7 +52,7 @@ public class UserRepositoryAdapter implements UserRepository {
     private User toDomain(UserEntity entity) {
         return User.of(
                 entity.getId(),
-                entity.getName(),
+                entity.getUsername(),
                 new Email(entity.getEmail()),
                 Role.valueOf(entity.getRole()),
                 entity.getCreatedAt());
@@ -56,7 +61,7 @@ public class UserRepositoryAdapter implements UserRepository {
     private UserEntity toEntity(User user) {
         return UserEntity.builder()
                 .id(user.getId())
-                .name(user.getName())
+                .username(user.getUsername())
                 .email(user.getEmail().value())
                 .role(user.getRole().name())
                 .createdAt(user.getCreatedAt())

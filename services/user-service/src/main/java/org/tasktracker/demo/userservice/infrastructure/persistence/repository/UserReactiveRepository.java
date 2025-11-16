@@ -13,4 +13,5 @@ import java.util.UUID;
  */
 public interface UserReactiveRepository extends ReactiveCrudRepository<UserEntity, UUID> {
     Mono<Boolean> existsByEmail(String email);
+    Mono<Boolean> existsByUsername(String username);
 }
