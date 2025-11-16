@@ -22,7 +22,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class UserEntity {
     @Id
     private UUID id;
-    private String name;
+    private String username;
     private String email;
     private String role;
     private Instant createdAt;

@@ -18,7 +18,7 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 public class User {
     private final UUID id;
-    private final String name;
+    private final String username;
     private final Email email;
     private final Role role;
     private final Instant createdAt;
@@ -32,11 +32,11 @@ public class User {
     }
 
     public User changeEmail(Email newEmail) {
-        return new User(this.id, this.name, newEmail, this.role, this.createdAt);
+        return new User(this.id, this.username, newEmail, this.role, this.createdAt);
     }
 
     public User changeRole(Role newRole) {
-        return new User(this.id, this.name, this.email, newRole, this.createdAt);
+        return new User(this.id, this.username, this.email, newRole, this.createdAt);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class User {
         if (this == obj) return true;
         if (!(obj instanceof User that)) return false;
         return Objects.equals(this.id, that.id) &&
-                Objects.equals(this.name, that.name) &&
+                Objects.equals(this.username, that.username) &&
                 Objects.equals(this.email, that.email) &&
                 Objects.equals(this.role, that.role) &&
                 Objects.equals(this.createdAt, that.createdAt);
@@ -52,6 +52,6 @@ public class User {
 
     @Override
     public final int hashCode() {
-        return Objects.hash(id, name, email, role, createdAt);
+        return Objects.hash(id, username, email, role, createdAt);
     }
 }
