@@ -1,7 +1,8 @@
 package org.tasktracker.demo.userservice.application.service;
 
+import jakarta.validation.constraints.NotNull;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;
-import org.tasktracker.demo.userservice.application.dto.UserResponse;
+import org.tasktracker.demo.userservice.domain.model.User;
 import reactor.core.publisher.Mono;
 
 /**
@@ -10,5 +11,5 @@ import reactor.core.publisher.Mono;
  * Time: 21:47:31
  */
 public interface UserRegistrationService {
-    Mono<UserResponse> register(UserRequest request);
+    Mono<User> register(@NotNull UserRequest request);
 }
