@@ -53,6 +53,7 @@ public class UserRepositoryAdapter implements UserRepository {
         return User.of(
                 entity.getId(),
                 entity.getUsername(),
+                entity.getPassword(),
                 new Email(entity.getEmail()),
                 Role.valueOf(entity.getRole()),
                 entity.getCreatedAt());
@@ -62,6 +63,7 @@ public class UserRepositoryAdapter implements UserRepository {
         return UserEntity.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .password(user.getPassword())
                 .email(user.getEmail().value())
                 .role(user.getRole().name())
                 .createdAt(user.getCreatedAt())
