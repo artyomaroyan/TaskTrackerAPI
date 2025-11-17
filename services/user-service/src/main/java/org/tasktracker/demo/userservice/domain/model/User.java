@@ -19,24 +19,25 @@ import static lombok.AccessLevel.PRIVATE;
 public class User {
     private final UUID id;
     private final String username;
+    private final String password;
     private final Email email;
     private final Role role;
     private final Instant createdAt;
 
-    public static User create(String name, Email email, Role role) {
-        return new User(UUID.randomUUID(), name, email, role, Instant.now());
+    public static User create(String username, String password, Email email, Role role) {
+        return new User(UUID.randomUUID(), username, password, email, role, Instant.now());
     }
 
-    public static User of(UUID id, String name, Email email, Role role, Instant createdAt) {
-        return new User(id, name, email, role, createdAt);
+    public static User of(UUID id, String username, String password, Email email, Role role, Instant createdAt) {
+        return new User(id, username, password, email, role, createdAt);
     }
 
     public User changeEmail(Email newEmail) {
-        return new User(this.id, this.username, newEmail, this.role, this.createdAt);
+        return new User(this.id, this.username, this.password, newEmail, this.role, this.createdAt);
     }
 
     public User changeRole(Role newRole) {
-        return new User(this.id, this.username, this.email, newRole, this.createdAt);
+        return new User(this.id, this.username, this.password, this.email, newRole, this.createdAt);
     }
 
     @Override

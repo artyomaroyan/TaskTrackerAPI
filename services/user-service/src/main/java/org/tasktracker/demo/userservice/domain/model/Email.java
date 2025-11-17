@@ -13,6 +13,6 @@ public record Email(String value) {
     }
 
     private static boolean isValidEmail(String value) {
-        return value.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+        return value.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
     }
 }
