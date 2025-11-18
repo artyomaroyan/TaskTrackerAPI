@@ -25,17 +25,27 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    // Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // WebFlux
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Database
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
-    implementation 'org.springframework:spring-jdbc'
-    compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
-    annotationProcessor 'org.projectlombok:lombok'
+
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
@@ -45,6 +55,10 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
+
+    // Swagger
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.7")
+    implementation("org.apache.commons:commons-lang3:3.20.0")
 }
 
 tasks.named('test') {
