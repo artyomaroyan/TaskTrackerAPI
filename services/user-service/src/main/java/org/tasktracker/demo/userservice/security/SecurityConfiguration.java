@@ -27,15 +27,17 @@ public class SecurityConfiguration {
     private final CorsConfigurationSource configurationSource;
 
     @Bean
-    protected SecurityWebFilterChain filterChain(ServerHttpSecurity httpSecurity) {
+    public SecurityWebFilterChain filterChain(ServerHttpSecurity httpSecurity) {
         return httpSecurity
                 .csrf(csrf -> csrf.requireCsrfProtectionMatcher(csrfMatcher))
                 .cors(cors -> cors.configurationSource(configurationSource))
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(PublicEndpoints.ALL)
-                        .permitAll()
+                            .permitAll()
+                        .pathMatchers("api/v1/user/register/**")
+                            .permitAll()
                         .anyExchange()
-                        .authenticated()
+                            .authenticated()
                 )
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)

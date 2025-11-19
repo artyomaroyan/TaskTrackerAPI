@@ -9,7 +9,7 @@ import java.util.stream.Stream;
  */
 final class PublicEndpoints {
     static final String[] SWAGGER = {
-            "/webjars/**", "/v2/api-docs", "/v3/api-docs/", "/v3/api-docs/**",
+            "/webjars/**", "/webjars/swagger-ui/**", "/v2/api-docs", "/v3/api-docs/", "/v3/api-docs/**",
             "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security"
     };
@@ -18,7 +18,11 @@ final class PublicEndpoints {
             "/.well-known/jwks.json"
     };
 
-    static final String[] ALL = Stream.of(SWAGGER, JWKS)
+    static final String[] WHITELIST = {
+            "/api/v1/user/register"
+    };
+
+    static final String[] ALL = Stream.of(SWAGGER, JWKS, WHITELIST)
             .flatMap(Stream::of)
             .toArray(String[]::new);
 }

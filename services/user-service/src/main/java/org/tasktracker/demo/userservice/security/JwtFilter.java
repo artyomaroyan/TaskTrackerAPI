@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Author: Artyom Aroyan
@@ -26,16 +28,24 @@ public class JwtFilter implements WebFilter {
     private final JwtService jwtService;
     private final ReactiveUserDetailsService userDetailsService;
 
+    private static final PathPatternParser PATH_PATTERN_PARSER = new PathPatternParser();
     // keep excluded path's in separate Set in case if in future they become more.
-    private static final Set<String> EXCLUDED_PATHS = Set.of(
-            "/api/v1/auth"
-    );
+    private static final List<PathPattern> EXCLUDED_PATHS = Stream.of(
+                    PublicEndpoints.SWAGGER,
+                    PublicEndpoints.JWKS,
+                    new String[]{"/api/v1/user/register"}
+            )
+            .flatMap(Stream::of)
+            .map(PATH_PATTERN_PARSER::parse)
+            .toList();
 
     @NonNull
     @Override
     public Mono<Void> filter(@NonNull final ServerWebExchange exchange, @NonNull final WebFilterChain chain) {
-        final String path = exchange.getRequest().getPath().value();
-        if (EXCLUDED_PATHS.contains(path)) return chain.filter(exchange);
+        for (PathPattern pattern : EXCLUDED_PATHS) {
+            if (pattern.matches(exchange.getRequest().getPath().pathWithinApplication()))
+                return chain.filter(exchange);
+        }
 
         return extractTokenFromRequest(exchange)
                 .flatMap(token -> {
