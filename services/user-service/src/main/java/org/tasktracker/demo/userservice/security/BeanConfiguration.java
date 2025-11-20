@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
  * Time: 00:28:11
  */
 @Configuration
-public class BeanConfiguration {
+class BeanConfiguration {
 
     @Bean
     protected ReactiveUserDetailsService userDetailsService() {

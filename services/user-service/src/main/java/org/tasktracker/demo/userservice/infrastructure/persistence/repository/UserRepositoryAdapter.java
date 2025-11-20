@@ -6,6 +6,8 @@ import org.tasktracker.demo.userservice.domain.model.Email;
 import org.tasktracker.demo.userservice.domain.model.Role;
 import org.tasktracker.demo.userservice.domain.model.User;
 import org.tasktracker.demo.userservice.domain.repository.UserRepository;
+import org.tasktracker.demo.userservice.exception.DataAccessException;
+import org.tasktracker.demo.userservice.exception.UserPersistenceException;
 import org.tasktracker.demo.userservice.infrastructure.persistence.entity.UserEntity;
 import reactor.core.publisher.Mono;
 
@@ -29,9 +31,11 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public Mono<User> save(User user) {
-        UserEntity entity = toEntity(user);
-        return reactiveRepository.save(entity)
-                .map(this::toDomain);
+        return Mono.just(user)
+                .map(this::toEntity)
+                .flatMap(reactiveRepository::save)
+                .map(this::toDomain)
+                .onErrorMap(DataAccessException.class, ex -> new UserPersistenceException("Failed to persist user", ex));
     }
 
     @Override
