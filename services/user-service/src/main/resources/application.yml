@@ -38,8 +38,11 @@ springdoc:
 logging:
   level:
     web: debug
+    sql: debug
+    # Swagger
     org.springdoc:
-      ui: debug
-      api: debug
-      core: debug
-      webflux: debug
+      ui: info
+      api: info
+      core: info
+      webflux: info
+    org.tasktracker.demo.userservice: debug
