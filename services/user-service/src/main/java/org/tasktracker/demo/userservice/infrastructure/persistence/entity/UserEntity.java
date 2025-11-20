@@ -1,6 +1,9 @@
 package org.tasktracker.demo.userservice.infrastructure.persistence.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -16,9 +19,9 @@ import static lombok.AccessLevel.PRIVATE;
  */
 @Getter
 @Builder
-@Table("users")
 @NoArgsConstructor(access = PRIVATE)
 @AllArgsConstructor(access = PRIVATE)
+@Table(name = "users", schema = "users")
 public class UserEntity {
     @Id
     private UUID id;

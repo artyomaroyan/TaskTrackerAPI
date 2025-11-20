@@ -12,14 +12,14 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 public record UserRequest(
-        @Schema(example = "user1")
+        @Schema(example = "User1")
         @NotBlank(message = "username is required field!")
         @Size(message = "username must be between 5 - 20 characters", min = 5, max = 20)
         String username,
         @Schema(example = "user1@gmail.com")
         @NotBlank(message = "email is required field!")
         String email,
-        @Schema(example = "password1")
+        @Schema(example = "Password.1")
         @NotBlank(message = "password is required field!")
         @Size(message = "password must be between 8 - 20 characters", min = 8, max = 20)
         String password

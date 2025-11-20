@@ -62,8 +62,10 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     }
 
     private Mono<UserRequest> validateRequest(@NotNull UserRequest request) {
-        if (!isValidUsername(request.username()) || !isValidPassword(request.password())) {
-            return Mono.error(new ValidationException("Invalid registration data!"));
+        if (!isValidUsername(request.username())) {
+            return Mono.error(new ValidationException("Invalid username!"));
+        } else if (!isValidPassword(request.password())) {
+            return Mono.error(new ValidationException("Invalid password!"));
         }
         return Mono.just(request);
     }

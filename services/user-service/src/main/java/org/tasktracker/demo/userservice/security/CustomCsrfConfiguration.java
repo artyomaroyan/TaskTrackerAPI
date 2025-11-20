@@ -21,7 +21,8 @@ class CustomCsrfConfiguration {
     protected ServerWebExchangeMatcher csrfMatcher() {
         List<String> ignore = Stream.of(
                         PublicEndpoints.SWAGGER,
-                        PublicEndpoints.JWKS
+                        PublicEndpoints.JWKS,
+                        PublicEndpoints.WHITELIST
                 )
                 .flatMap(Stream::of)
                 .toList();

@@ -25,7 +25,7 @@ public class User {
     private final Instant createdAt;
 
     public static User create(String username, String password, Email email, Role role) {
-        return new User(UUID.randomUUID(), username, password, email, role, Instant.now());
+        return new User(null, username, password, email, role, Instant.now());
     }
 
     public static User of(UUID id, String username, String password, Email email, Role role, Instant createdAt) {
