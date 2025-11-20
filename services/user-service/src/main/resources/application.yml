@@ -10,6 +10,16 @@ spring:
     password: ${DB_PASSWORD}
     properties:
       show-sql: true
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://${DB_URL}:${DB_PORT}/${DB_NAME}
+    user: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    schemas: users
+    default-schema: users
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    driver-class-name: org.postgresql.Driver
 
   security:
     jwt:
@@ -37,12 +47,19 @@ springdoc:
 
 logging:
   level:
-    web: debug
-    sql: debug
-    # Swagger
-    org.springdoc:
-      ui: info
-      api: info
-      core: info
-      webflux: info
-    org.tasktracker.demo.userservice: debug
+    web: info
+    sql: info
+    org:
+      tasktracker:
+        demo:
+          userservice: debug
+      flywaydb: info
+      springframework:
+        data:
+          r2dbc:
+            core: info
+          _: info
+        r2dbc: info
+    io:
+      r2dbc:
+        postgresql: info
