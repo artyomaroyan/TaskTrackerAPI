@@ -1,0 +1,46 @@
+/*
+package org.tasktracker.demo.mapper.functional;
+
+import org.springframework.stereotype.Component;
+import org.tasktracker.demo.exception.DataMappingException;
+
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Author: Artyom Aroyan
+ * Date: 21.11.25
+ * Time: 23:21:17
+ * This class is example code, which I write just to not lose this mapping logic.
+
+@Component
+public class FunctionalMapper {
+    private static final Logger log = Logger.getLogger(FunctionalMapper.class.getName());
+
+    public <D, E>Function<E, D> createMapper(
+            Function<E, D> toDomainFunction,
+            Function<D, E> toEntityFunction,
+            Class<E> entityClass,
+            Class<D> domainClass) {
+
+        return entity -> {
+            if (entity == null) {
+                log.log(Level.WARNING, String.format("Attempted to map null %s to domain", entityClass.getSimpleName()));
+                return null;
+            }
+
+            try {
+                return toDomainFunction.apply(entity);
+            } catch (Exception ex) {
+                handleMappingError(entityClass.getSimpleName(), "domain", ex);
+                throw new DataMappingException("Mapping failed", ex);
+            }
+        };
+    }
+
+    private void handleMappingError(String sourceType, String targetType, Exception ex) {
+        log.log(Level.SEVERE, String.format("Failed to map %s to %s %s", sourceType, targetType, ex));
+    }
+}
+ */
