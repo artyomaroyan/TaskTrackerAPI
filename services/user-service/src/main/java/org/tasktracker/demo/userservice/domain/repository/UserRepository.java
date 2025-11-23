@@ -13,8 +13,8 @@ import java.util.UUID;
  */
 public interface UserRepository {
     Mono<User> findById(UUID id);
+    Mono<User> findByUsername(String username);
     Mono<User> save(User user);
     Mono<Boolean> existsByEmail(Email email);
-    Mono<Boolean> existsByUsername(String username);
     Mono<Void> delete(UUID id);
 }
