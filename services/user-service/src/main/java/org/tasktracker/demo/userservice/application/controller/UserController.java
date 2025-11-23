@@ -3,15 +3,14 @@ package org.tasktracker.demo.userservice.application.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;
 import org.tasktracker.demo.userservice.application.service.UserRegistrationService;
 import org.tasktracker.demo.userservice.application.service.UserService;
 import org.tasktracker.demo.userservice.domain.model.User;
 import reactor.core.publisher.Mono;
+
+import java.util.UUID;
 
 /**
  * Author: Artyom Aroyan
@@ -28,6 +27,24 @@ public class UserController {
     @PostMapping("/register")
     ResponseEntity<Mono<User>> register(@Valid @RequestBody UserRequest request) {
         var response = userRegistrationService.register(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get/{userId}")
+    ResponseEntity<Mono<User>> findUserById(@PathVariable UUID userId) {
+        var response = userService.findUserById(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get/{username}")
+    ResponseEntity<Mono<User>> findUserByUsername(@PathVariable String username) {
+        var response = userService.findUserByUsername(username);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    ResponseEntity<Mono<Void>> deleteUserById(@PathVariable UUID userId) {
+        var response = userService.deleteUserById(userId);
         return ResponseEntity.ok(response);
     }
 }
