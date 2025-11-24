@@ -1,3 +1,4 @@
+/*
 package org.tasktracker.demo.userservice.security;
 
 import lombok.NonNull;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
  * Author: Artyom Aroyan
  * Date: 13.11.25
  * Time: 19:37:10
- */
+
 @Component
 @RequiredArgsConstructor
 public class JwtFilter implements WebFilter {
@@ -79,3 +80,4 @@ public class JwtFilter implements WebFilter {
                 .findFirst());
     }
 }
+ */

@@ -1,3 +1,4 @@
+/*
 package org.tasktracker.demo.userservice.security;
 
 import org.springframework.context.annotation.Bean;
@@ -9,7 +10,7 @@ import reactor.core.publisher.Mono;
  * Author: Artyom Aroyan
  * Date: 19.11.25
  * Time: 00:28:11
- */
+
 @Configuration
 class BeanConfiguration {
 
@@ -18,3 +19,4 @@ class BeanConfiguration {
         return _ -> Mono.empty();
     }
 }
+ */
