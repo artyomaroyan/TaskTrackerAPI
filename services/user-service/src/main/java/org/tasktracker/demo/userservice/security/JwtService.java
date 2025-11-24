@@ -29,8 +29,8 @@ public class JwtService {
     private long jwtExpiration;
 
     public JwtService() throws Exception {
-        this.privateKey = KeyUtils.loadPrivateKey("/Users/artyom_aroyan/Software/Java/.keys/private_key.pem");
-        this.publicKey = KeyUtils.loadPublicKey("/Users/artyom_aroyan/Software/Java/.keys/public_key.pem");
+        this.privateKey = KeyUtils.loadPrivateKey();
+        this.publicKey = KeyUtils.loadPublicKey();
     }
 
     public String generateAccessToken(final String username) {

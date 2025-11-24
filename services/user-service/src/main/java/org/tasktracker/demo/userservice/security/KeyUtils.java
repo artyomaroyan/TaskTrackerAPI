@@ -20,8 +20,8 @@ final class KeyUtils {
     private KeyUtils() {
     }
 
-    public static PrivateKey loadPrivateKey(final String pemPath) throws Exception {
-        final String key = readKeyFromResource(pemPath)
+    static PrivateKey loadPrivateKey() throws Exception {
+        final String key = readKeyFromResource("/Users/artyom_aroyan/Software/Java/.keys/private_key.pem")
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
@@ -31,8 +31,8 @@ final class KeyUtils {
         return KeyFactory.getInstance(JWT_ALGORITHM).generatePrivate(keySpec);
     }
 
-    public static PublicKey loadPublicKey(final String pemPath) throws Exception {
-        final String key = readKeyFromResource(pemPath)
+    static PublicKey loadPublicKey() throws Exception {
+        final String key = readKeyFromResource("/Users/artyom_aroyan/Software/Java/.keys/public_key.pem")
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
