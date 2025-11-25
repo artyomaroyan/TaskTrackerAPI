@@ -24,7 +24,10 @@ spring:
   security:
     jwt:
       issuer: ${ASYMMETRIC_JWT_ISSUER}
-      expiration: ${ASYMMETRIC_JWT_KEY_EXPIRATION}
+      expiration: ${ASYMMETRIC_JWT_EXPIRATION}
+      algorithm: ${ASYMMETRIC_JWT_ALGORITHM}
+      rsa-private-key-path: ${RSA_PRIVATE_KEY_PATH}
+      rsa-public-key-path: ${RSA_PUBLIC_KEY_PATH}
     argon2:
       memory: ${ARGON2_MEMORY}
       iterations: ${ARGON2_ITERATIONS}
