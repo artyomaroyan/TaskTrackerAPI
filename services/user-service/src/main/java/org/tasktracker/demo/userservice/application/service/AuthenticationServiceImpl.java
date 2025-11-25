@@ -3,11 +3,11 @@ package org.tasktracker.demo.userservice.application.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.tasktracker.demo.userservice.application.dto.AuthenticationRequest;
-import org.tasktracker.demo.userservice.security.JwtService;
-import org.tasktracker.demo.userservice.security.UsernamePasswordAuthenticationManager;
+import org.tasktracker.demo.userservice.security.UserIdentity;
+import org.tasktracker.demo.userservice.security.BasicAuthenticationManager;
+import org.tasktracker.demo.userservice.security.interfaces.TokenProvider;
 import reactor.core.publisher.Mono;
 
 /**
@@ -19,18 +19,17 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
-    private final JwtService jwtService;
-    private final UsernamePasswordAuthenticationManager authenticationManager;
+    private final TokenProvider tokenProvider;
+    private final BasicAuthenticationManager authenticationManager;
 
     @Override
     public Mono<String> login(AuthenticationRequest request) {
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
+        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                         request.username(), request.password()
                 ))
-                .map(authentication -> {
-                    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                    return jwtService.generateAccessToken(userDetails.getUsername());
+                .flatMap(authentication -> {
+                    UserIdentity userIdentity = (UserIdentity) authentication.getPrincipal();
+                    return tokenProvider.generateAccessToken(userIdentity);
                 });
     }
 }
