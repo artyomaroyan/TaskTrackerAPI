@@ -8,9 +8,10 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import reactor.core.publisher.Mono;
 
 /**
  * Author: Artyom Aroyan
@@ -21,28 +22,32 @@ import reactor.core.publisher.Mono;
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
 @EnableReactiveMethodSecurity
-public class SecurityConfiguration {
-    private final JwtFilter jwtFilter;
+class SecurityConfiguration {
     private final ServerWebExchangeMatcher csrfMatcher;
     private final CorsConfigurationSource configurationSource;
+    private final MultipleAuthenticationConverter authenticationConverter;
+    private final DelegatingReactiveAuthenticationManager authenticationManager;
 
     @Bean
-    public SecurityWebFilterChain filterChain(ServerHttpSecurity httpSecurity) {
+    protected SecurityWebFilterChain filterChain(ServerHttpSecurity httpSecurity) {
         return httpSecurity
                 .csrf(csrf -> csrf.requireCsrfProtectionMatcher(csrfMatcher))
                 .cors(cors -> cors.configurationSource(configurationSource))
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(PublicEndpoints.ALL)
                             .permitAll()
-                        .pathMatchers("api/v1/user/register/**")
-                            .permitAll()
                         .anyExchange()
                             .authenticated()
                 )
-                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-                .authenticationManager(_ -> Mono.error(new IllegalStateException("JWT authentication should handle this")))
-                .addFilterBefore(this.jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .authenticationManager(authenticationManager)
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                .addFilterAt(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
+    }
+
+    private AuthenticationWebFilter authenticationWebFilter() {
+        AuthenticationWebFilter webFilter = new AuthenticationWebFilter(authenticationManager);
+        webFilter.setServerAuthenticationConverter(authenticationConverter);
+        return webFilter;
     }
 }

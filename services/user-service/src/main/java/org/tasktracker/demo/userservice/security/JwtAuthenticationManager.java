@@ -1,12 +1,13 @@
 package org.tasktracker.demo.userservice.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.stereotype.Component;
-import org.tasktracker.demo.userservice.exception.UserNotFoundException;
+import org.tasktracker.demo.userservice.exception.TokenValidationException;
+import org.tasktracker.demo.userservice.security.interfaces.TokenProvider;
 import reactor.core.publisher.Mono;
 
 /**
@@ -14,32 +15,32 @@ import reactor.core.publisher.Mono;
  * Date: 24.11.25
  * Time: 18:01:20
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
-    private final JwtService jwtService;
-    private final ReactiveUserDetailsService userDetailsService;
+    private final TokenProvider tokenProvider;
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
-        return Mono.justOrEmpty(authentication)
+        return Mono.just(authentication)
+                .filter(auth -> auth instanceof BearerToken)
                 .cast(BearerToken.class)
-                .flatMap(auth -> {
-                    String token = auth.getCredentials();
-                    String username = jwtService.extractUsername(token);
+                .switchIfEmpty(Mono.empty())
+                .flatMap(this::authenticateBearerToken)
+                .doOnError(error -> log.warn("Jwt authentication failed: {}", error.getMessage()));
+    }
 
-                    return userDetailsService.findByUsername(username)
-                            .switchIfEmpty(Mono.error(new UserNotFoundException("User not found!")))
-                            .flatMap(userDetails -> {
-                                if (jwtService.isTokenValid(token, userDetails.getUsername())) {
-                                    return Mono.justOrEmpty(
-                                            new UsernamePasswordAuthenticationToken(
-                                                    userDetails, userDetails.getAuthorities()
-                                            ));
-                                } else {
-                                    return Mono.error(new IllegalArgumentException("Invalid token!"));
-                                }
-                            });
-                });
+    private Mono<Authentication> authenticateBearerToken(BearerToken bearerToken) {
+        String token = bearerToken.getToken();
+        return tokenProvider.validateToken(token)
+                .filter(Boolean::booleanValue)
+                .switchIfEmpty(Mono.error(new TokenValidationException("Invalid Token!")))
+                .then(tokenProvider.extractUserIdentity(token))
+                .map(userIdentity -> new UsernamePasswordAuthenticationToken(
+                        userIdentity,
+                        token,
+                        userIdentity.getAuthorities()
+                ));
     }
 }
