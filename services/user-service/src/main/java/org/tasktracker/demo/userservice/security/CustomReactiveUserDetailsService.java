@@ -1,3 +1,4 @@
+/*
 package org.tasktracker.demo.userservice.security;
 
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import reactor.core.publisher.Mono;
  * Author: Artyom Aroyan
  * Date: 24.11.25
  * Time: 19:24:43
- */
+
 @Service
 @RequiredArgsConstructor
 public class CustomReactiveUserDetailsService implements ReactiveUserDetailsService {
@@ -28,3 +29,4 @@ public class CustomReactiveUserDetailsService implements ReactiveUserDetailsServ
                         .build());
     }
 }
+ */

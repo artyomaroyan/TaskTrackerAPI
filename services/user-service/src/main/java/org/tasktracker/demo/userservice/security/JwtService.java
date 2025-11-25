@@ -1,3 +1,4 @@
+/*
 package org.tasktracker.demo.userservice.security;
 
 import io.jsonwebtoken.Claims;
@@ -17,7 +18,7 @@ import java.util.UUID;
  * Author: Artyom Aroyan
  * Date: 13.11.25
  * Time: 19:37:44
- */
+
 @Service
 public class JwtService {
     private final PrivateKey privateKey;
@@ -82,3 +83,4 @@ public class JwtService {
         }
     }
 }
+ */
