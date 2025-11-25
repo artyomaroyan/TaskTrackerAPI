@@ -3,6 +3,7 @@ package org.tasktracker.demo.userservice.application.service;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.ValidationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +17,17 @@ import org.tasktracker.demo.userservice.exception.RegistrationException;
 import org.tasktracker.demo.userservice.exception.UserExistsException;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
 import java.util.regex.Pattern;
+
+import static org.tasktracker.demo.userservice.domain.model.Authorities.*;
 
 /**
  * Author: Artyom Aroyan
  * Date: 15.11.25
  * Time: 21:52:49
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserRegistrationServiceImpl implements UserRegistrationService {
@@ -45,7 +50,9 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                     request.username(),
                     passwordEncoder.encode(request.password()),
                     new Email(request.email()),
-                    Role.USER
+                    Set.of(CREATE, UPDATE, DELETE), // setting users authority logic should be improved!!!.
+                    Role.USER,
+                    true
             );
             return userRepository.save(newUser);
         } catch (RegistrationException ex) {
