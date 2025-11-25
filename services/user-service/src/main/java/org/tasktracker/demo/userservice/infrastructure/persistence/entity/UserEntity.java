@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+import org.tasktracker.demo.userservice.domain.model.Authorities;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -29,5 +31,7 @@ public class UserEntity {
     private String password;
     private String email;
     private String role;
+    private Set<Authorities> authorities;
     private Instant createdAt;
+    private boolean active;
 }
