@@ -23,15 +23,15 @@ public class User {
     private final String password;
     private final Email email;
     private final Role role;
-    private final Set<Authorities> authorities;
+    private final Set<String> authorities;
     private final Instant createdAt;
     private final boolean active;
 
-    public static User create(String username, String password, Email email, Set<Authorities> authorities, Role role, boolean active) {
+    public static User create(String username, String password, Email email, Set<String> authorities, Role role, boolean active) {
         return new User(null, username, password, email, role, authorities, Instant.now(), active);
     }
 
-    public static User of(UUID id, String username, String password, Email email, Role role, Set<Authorities> authorities, Instant createdAt, boolean active) {
+    public static User of(UUID id, String username, String password, Email email, Role role, Set<String> authorities, Instant createdAt, boolean active) {
         return new User(id, username, password, email, role, authorities, createdAt, active);
     }
 
