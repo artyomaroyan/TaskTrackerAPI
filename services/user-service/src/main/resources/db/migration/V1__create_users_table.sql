@@ -4,5 +4,7 @@ create table if not exists users(
     password varchar(500) not null ,
     email varchar(50) not null unique ,
     role varchar(20) not null ,
-    created_at timestamp default current_timestamp
+    authorities varchar(100) not null ,
+    created_at timestamp default current_timestamp,
+    active boolean not null default true
 );
