@@ -50,7 +50,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                     request.username(),
                     passwordEncoder.encode(request.password()),
                     new Email(request.email()),
-                    Set.of(CREATE, UPDATE, DELETE), // setting users authority logic should be improved!!!.
+                    Set.of(CREATE.name(), UPDATE.name(), DELETE.name()), // setting users authority logic should be improved!!!.
                     Role.USER,
                     true
             );

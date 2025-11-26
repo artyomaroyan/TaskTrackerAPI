@@ -4,12 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.tasktracker.demo.userservice.domain.model.Authorities;
 import org.tasktracker.demo.userservice.domain.repository.UserRepository;
 import org.tasktracker.demo.userservice.security.interfaces.UserDetailsProvider;
 import reactor.core.publisher.Mono;
-
-import java.util.stream.Collectors;
 
 /**
  * Author: Artyom Aroyan
@@ -27,9 +24,7 @@ public class UserDetailsProviderImpl implements UserDetailsProvider {
         return userRepository.findByUsername(username)
                 .map(user -> new UserIdentity(
                         user.getUsername(),
-                        user.getAuthorities().stream()
-                                .map(Authorities::name)
-                                .collect(Collectors.toSet()),
+                        user.getAuthorities(),
                         user.isActive()
                 ));
     }
