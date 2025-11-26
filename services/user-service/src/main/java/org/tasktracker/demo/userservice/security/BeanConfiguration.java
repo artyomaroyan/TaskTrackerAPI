@@ -1,7 +1,13 @@
 package org.tasktracker.demo.userservice.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.tasktracker.demo.userservice.security.interfaces.TokenProvider;
 
 /**
  * Author: Artyom Aroyan
@@ -9,6 +15,33 @@ import org.springframework.context.annotation.Configuration;
  * Time: 00:28:11
  */
 @Configuration
+@RequiredArgsConstructor
 @EnableConfigurationProperties(JwtProperties.class)
 class BeanConfiguration {
+    private final TokenProvider tokenProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final ReactiveUserDetailsService userDetailsService;
+
+    @Bean
+    public ReactiveAuthenticationManager authenticationManager() {
+        return new DelegatingReactiveAuthenticationManager(
+                jwtAuthenticationManager(),
+                basicAuthenticationManager()
+        );
+    }
+
+    @Bean
+    public JwtAuthenticationManager jwtAuthenticationManager() {
+        return new JwtAuthenticationManager(tokenProvider);
+    }
+
+    @Bean
+    public BasicAuthenticationManager basicAuthenticationManager() {
+        return new BasicAuthenticationManager(passwordEncoder, userDetailsService);
+    }
+
+    @Bean
+    public MultipleAuthenticationConverter multipleAuthenticationConverter() {
+        return new MultipleAuthenticationConverter();
+    }
 }

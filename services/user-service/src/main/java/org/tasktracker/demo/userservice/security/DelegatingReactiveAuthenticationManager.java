@@ -1,10 +1,8 @@
 package org.tasktracker.demo.userservice.security;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,11 +15,9 @@ import java.util.List;
  * Time: 18:05:54
  */
 @Slf4j
-@Component
 public class DelegatingReactiveAuthenticationManager implements ReactiveAuthenticationManager {
     private final List<ReactiveAuthenticationManager> authenticationManagers;
 
-    @Autowired
     public DelegatingReactiveAuthenticationManager(JwtAuthenticationManager jwtAuthenticationManager,
                                                    BasicAuthenticationManager basicAuthenticationManager) {
         this.authenticationManagers = List.of(jwtAuthenticationManager, basicAuthenticationManager);

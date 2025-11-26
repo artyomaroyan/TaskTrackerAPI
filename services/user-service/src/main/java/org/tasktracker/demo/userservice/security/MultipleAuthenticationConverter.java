@@ -1,18 +1,15 @@
 package org.tasktracker.demo.userservice.security;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.naming.AuthenticationException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -22,7 +19,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
  * Time: 17:51:53
  */
 @Slf4j
-@Component
 public class MultipleAuthenticationConverter implements ServerAuthenticationConverter {
     private static final String BASIC_PREFIX = "Basic ";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -31,7 +27,7 @@ public class MultipleAuthenticationConverter implements ServerAuthenticationConv
     public Mono<Authentication> convert(ServerWebExchange exchange) {
         return extractAuthHeader(exchange)
                 .flatMap(this::createAuthenticationToken)
-                .defaultIfEmpty(new AnonymousAuthenticationToken("anonymous", "anonymous", List.of()));
+                .switchIfEmpty(Mono.empty());
     }
 
     private Mono<String> extractAuthHeader(ServerWebExchange exchange) {

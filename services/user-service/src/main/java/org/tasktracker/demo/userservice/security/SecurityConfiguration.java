@@ -3,6 +3,7 @@ package org.tasktracker.demo.userservice.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -25,8 +26,8 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 class SecurityConfiguration {
     private final ServerWebExchangeMatcher csrfMatcher;
     private final CorsConfigurationSource configurationSource;
+    private final ReactiveAuthenticationManager authenticationManager;
     private final MultipleAuthenticationConverter authenticationConverter;
-    private final DelegatingReactiveAuthenticationManager authenticationManager;
 
     @Bean
     protected SecurityWebFilterChain filterChain(ServerHttpSecurity httpSecurity) {

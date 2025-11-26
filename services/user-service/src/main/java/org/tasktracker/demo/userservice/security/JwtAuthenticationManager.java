@@ -1,11 +1,9 @@
 package org.tasktracker.demo.userservice.security;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
 import org.tasktracker.demo.userservice.exception.TokenValidationException;
 import org.tasktracker.demo.userservice.security.interfaces.TokenProvider;
 import reactor.core.publisher.Mono;
@@ -16,10 +14,7 @@ import reactor.core.publisher.Mono;
  * Time: 18:01:20
  */
 @Slf4j
-@Component
-@RequiredArgsConstructor
-public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
-    private final TokenProvider tokenProvider;
+public record JwtAuthenticationManager(TokenProvider tokenProvider) implements ReactiveAuthenticationManager {
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {

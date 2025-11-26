@@ -1,6 +1,5 @@
 package org.tasktracker.demo.userservice.security;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -8,7 +7,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.tasktracker.demo.userservice.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
 
@@ -18,11 +16,9 @@ import reactor.core.publisher.Mono;
  * Time: 19:12:44
  */
 @Slf4j
-@Component
-@RequiredArgsConstructor
-public class BasicAuthenticationManager implements ReactiveAuthenticationManager {
-    private final PasswordEncoder passwordEncoder;
-    private final ReactiveUserDetailsService userDetailsService;
+public record BasicAuthenticationManager(
+        PasswordEncoder passwordEncoder,
+        ReactiveUserDetailsService userDetailsService) implements ReactiveAuthenticationManager {
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
