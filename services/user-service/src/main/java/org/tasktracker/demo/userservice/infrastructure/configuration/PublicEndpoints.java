@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.security;
+package org.tasktracker.demo.userservice.infrastructure.configuration;
 
 import java.util.stream.Stream;
 
@@ -7,7 +7,8 @@ import java.util.stream.Stream;
  * Date: 13.11.25
  * Time: 21:37:15
  */
-final class PublicEndpoints {
+public final class PublicEndpoints {
+
     static final String[] SWAGGER = {
             "/webjars/**", "/webjars/swagger-ui/**", "/v2/api-docs", "/v3/api-docs/", "/v3/api-docs/**",
             "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources", "/swagger-resources/**",
@@ -19,7 +20,8 @@ final class PublicEndpoints {
     };
 
     static final String[] WHITELIST = {
-            "/api/v1/user/register"
+            "/api/v1/user/register",
+            "/api/v1/user/login"
     };
 
     static final String[] ALL = Stream.of(SWAGGER, JWKS, WHITELIST)

@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.security;
+package org.tasktracker.demo.userservice.infrastructure.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +14,9 @@ import java.util.List;
  * Time: 21:34:49
  */
 @Configuration
-class CustomCorsConfiguration {
+public class CustomCorsConfiguration {
     @Bean
-    protected CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://localhost:8082"));
 

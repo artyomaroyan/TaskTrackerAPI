@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.application.configuration;
+package org.tasktracker.demo.userservice.infrastructure.configuration;
 
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;

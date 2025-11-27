@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.security;
+package org.tasktracker.demo.userservice.infrastructure.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +16,10 @@ import java.util.stream.Stream;
  * Time: 21:36:25
  */
 @Configuration
-class CustomCsrfConfiguration {
+public class CustomCsrfConfiguration {
+
     @Bean
-    protected ServerWebExchangeMatcher csrfMatcher() {
+    public ServerWebExchangeMatcher csrfMatcher() {
         List<String> ignore = Stream.of(
                         PublicEndpoints.SWAGGER,
                         PublicEndpoints.JWKS,

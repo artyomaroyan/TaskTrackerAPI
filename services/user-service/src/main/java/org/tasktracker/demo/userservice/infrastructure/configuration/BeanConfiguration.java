@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.security;
+package org.tasktracker.demo.userservice.infrastructure.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -6,8 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.tasktracker.demo.userservice.security.interfaces.TokenProvider;
+import org.tasktracker.demo.userservice.application.ports.out.TokenProvider;
+import org.tasktracker.demo.userservice.security.BasicAuthenticationManager;
+import org.tasktracker.demo.userservice.security.DelegatingReactiveAuthenticationManager;
+import org.tasktracker.demo.userservice.security.JwtAuthenticationManager;
+import org.tasktracker.demo.userservice.security.MultipleAuthenticationConverter;
 
 /**
  * Author: Artyom Aroyan
@@ -16,10 +21,11 @@ import org.tasktracker.demo.userservice.security.interfaces.TokenProvider;
  */
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties(JwtProperties.class)
-class BeanConfiguration {
+@EnableConfigurationProperties({JwtProperties.class, PasswordEncoderProperties.class})
+public class BeanConfiguration {
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoderProperties properties;
     private final ReactiveUserDetailsService userDetailsService;
 
     @Bean
@@ -43,5 +49,16 @@ class BeanConfiguration {
     @Bean
     public MultipleAuthenticationConverter multipleAuthenticationConverter() {
         return new MultipleAuthenticationConverter();
+    }
+
+    @Bean
+    public Argon2PasswordEncoder passwordEncoder() {
+        return new Argon2PasswordEncoder(
+                properties.saltLength(),
+                properties.hashLength(),
+                properties.parallelism(),
+                properties.memory(),
+                properties.iterations()
+        );
     }
 }

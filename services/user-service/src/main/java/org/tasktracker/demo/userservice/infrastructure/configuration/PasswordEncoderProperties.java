@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.security;
+package org.tasktracker.demo.userservice.infrastructure.configuration;
 
 import jakarta.validation.constraints.Positive;
 import lombok.NonNull;
