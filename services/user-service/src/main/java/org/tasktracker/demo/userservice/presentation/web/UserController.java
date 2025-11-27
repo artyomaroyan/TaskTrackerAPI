@@ -1,12 +1,14 @@
-package org.tasktracker.demo.userservice.application.controller;
+package org.tasktracker.demo.userservice.presentation.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.tasktracker.demo.userservice.application.dto.AuthenticationRequest;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;
-import org.tasktracker.demo.userservice.application.service.UserRegistrationService;
-import org.tasktracker.demo.userservice.application.service.UserService;
+import org.tasktracker.demo.userservice.application.ports.in.AuthenticationService;
+import org.tasktracker.demo.userservice.application.ports.in.UserRegistrationService;
+import org.tasktracker.demo.userservice.application.ports.in.UserService;
 import org.tasktracker.demo.userservice.domain.model.User;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +24,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/user")
 public class UserController {
     private final UserService userService;
+    private final AuthenticationService authenticationService;
     private final UserRegistrationService userRegistrationService;
 
     @PostMapping("/register")
@@ -45,6 +48,12 @@ public class UserController {
     @DeleteMapping("/delete/{userId}")
     ResponseEntity<Mono<Void>> deleteUserById(@PathVariable UUID userId) {
         var response = userService.deleteUserById(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/login")
+    ResponseEntity<Mono<String>> login(@Valid @RequestBody AuthenticationRequest request) {
+        var response = authenticationService.login(request);
         return ResponseEntity.ok(response);
     }
 }

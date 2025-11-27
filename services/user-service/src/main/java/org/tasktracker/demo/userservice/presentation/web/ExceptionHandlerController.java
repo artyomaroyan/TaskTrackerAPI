@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.application.controller;
+package org.tasktracker.demo.userservice.presentation.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
