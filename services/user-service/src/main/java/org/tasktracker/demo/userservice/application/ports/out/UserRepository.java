@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.domain.repository;
+package org.tasktracker.demo.userservice.application.ports.out;
 
 import org.tasktracker.demo.userservice.domain.model.Email;
 import org.tasktracker.demo.userservice.domain.model.User;

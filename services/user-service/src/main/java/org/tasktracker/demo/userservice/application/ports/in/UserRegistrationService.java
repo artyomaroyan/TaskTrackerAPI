@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.application.service;
+package org.tasktracker.demo.userservice.application.ports.in;
 
 import jakarta.validation.constraints.NotNull;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;

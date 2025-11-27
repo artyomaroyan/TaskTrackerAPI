@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.application.service;
+package org.tasktracker.demo.userservice.application.usecases;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.ValidationException;
@@ -8,13 +8,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;
+import org.tasktracker.demo.userservice.application.ports.in.UserRegistrationService;
 import org.tasktracker.demo.userservice.domain.model.Email;
 import org.tasktracker.demo.userservice.domain.model.Role;
 import org.tasktracker.demo.userservice.domain.model.User;
-import org.tasktracker.demo.userservice.domain.repository.UserRepository;
+import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
 import org.tasktracker.demo.userservice.exception.DataAccessException;
-import org.tasktracker.demo.userservice.exception.RegistrationException;
-import org.tasktracker.demo.userservice.exception.UserExistsException;
+import org.tasktracker.demo.userservice.application.exception.RegistrationException;
+import org.tasktracker.demo.userservice.domain.exception.UserExistenceException;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
@@ -64,7 +65,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         final Email email = new Email(request.email());
         return userRepository.existsByEmail(email)
                 .flatMap(exist -> exist ?
-                        Mono.error(new UserExistsException("User with " + email.value() + " already exists!")) :
+                        Mono.error(new UserExistenceException("User with " + email.value() + " already exists!")) :
                         Mono.just(request));
     }
 

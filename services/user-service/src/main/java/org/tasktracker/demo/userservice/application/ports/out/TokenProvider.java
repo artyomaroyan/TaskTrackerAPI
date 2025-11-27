@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.security.interfaces;
+package org.tasktracker.demo.userservice.application.ports.out;
 
 import org.tasktracker.demo.userservice.security.UserIdentity;
 import reactor.core.publisher.Mono;

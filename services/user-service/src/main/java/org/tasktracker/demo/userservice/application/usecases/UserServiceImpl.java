@@ -1,11 +1,12 @@
-package org.tasktracker.demo.userservice.application.service;
+package org.tasktracker.demo.userservice.application.usecases;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.tasktracker.demo.userservice.application.ports.in.UserService;
 import org.tasktracker.demo.userservice.domain.model.User;
-import org.tasktracker.demo.userservice.domain.repository.UserRepository;
-import org.tasktracker.demo.userservice.exception.UserNotFoundException;
+import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
+import org.tasktracker.demo.userservice.domain.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;

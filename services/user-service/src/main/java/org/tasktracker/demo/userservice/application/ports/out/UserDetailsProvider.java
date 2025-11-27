@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.security.interfaces;
+package org.tasktracker.demo.userservice.application.ports.out;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
