@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.exception;
+package org.tasktracker.demo.userservice.domain.exception;
 
 /**
  * Author: Artyom Aroyan

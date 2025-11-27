@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.exception;
+package org.tasktracker.demo.userservice.domain.exception;
 
 /**
  * Author: Artyom Aroyan
@@ -6,6 +6,10 @@ package org.tasktracker.demo.userservice.exception;
  * Time: 14:26:56
  */
 public class UserExistenceException extends RuntimeException {
+    public UserExistenceException(String message) {
+        super(message);
+    }
+
     public UserExistenceException(String message, Throwable cause) {
         super(message, cause);
     }
