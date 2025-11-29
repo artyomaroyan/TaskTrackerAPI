@@ -18,21 +18,40 @@ import java.util.List;
 public class DelegatingReactiveAuthenticationManager implements ReactiveAuthenticationManager {
     private final List<ReactiveAuthenticationManager> authenticationManagers;
 
-    public DelegatingReactiveAuthenticationManager(JwtAuthenticationManager jwtAuthenticationManager,
-                                                   BasicAuthenticationManager basicAuthenticationManager) {
-        this.authenticationManagers = List.of(jwtAuthenticationManager, basicAuthenticationManager);
+    public DelegatingReactiveAuthenticationManager(BasicAuthenticationManager basicAuthenticationManager,
+                                                   JwtAuthenticationManager jwtAuthenticationManager) {
+        this.authenticationManagers = List.of(basicAuthenticationManager, jwtAuthenticationManager);
     }
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
+        log.debug("DelegatingReactiveAuthenticationManager: Processing authentication type: {}",
+                authentication != null ? authentication.getClass().getSimpleName() : "Authentication not found");
+
+        if (authentication == null) {
+            return Mono.error(new AuthenticationException("Authentication object is null"));
+        }
+
+        log.debug("DelegatingReactiveAuthenticationManager: Authentication details - Name: {}, Authenticated: {}",
+                authentication.getName(), authentication.isAuthenticated());
+
         return Flux.fromIterable(authenticationManagers)
+                .doOnNext(manager -> log.debug("Trying authentication manager: {}",
+                        manager.getClass().getSimpleName()))
                 .concatMap(manager -> manager.authenticate(authentication)
+                        .doOnNext(_ -> log.debug("Manager {} successfully authenticated",
+                                manager.getClass().getSimpleName()))
                         .onErrorResume(error -> {
-                            log.debug("Authentication manager {} can not process {}",
+                            log.debug("Authentication manager {} can not process: {}",
                                     manager.getClass().getSimpleName(), error.getMessage());
+
                             return Mono.empty();
                         }))
                 .next()
-                .switchIfEmpty(Mono.error(new AuthenticationException("No authentication manager could process the request")));
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("No authentication manager could process the request. Authentication type: {}",
+                            authentication.getClass().getSimpleName());
+                    return Mono.error(new AuthenticationException("No authentication manager could process the request:"));
+                }));
     }
 }
