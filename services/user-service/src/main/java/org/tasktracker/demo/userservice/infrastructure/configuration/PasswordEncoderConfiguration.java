@@ -1,10 +1,11 @@
-package org.tasktracker.demo.userservice.security;
+package org.tasktracker.demo.userservice.infrastructure.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.tasktracker.demo.userservice.security.PasswordEncoderService;
 
 /**
  * Author: Artyom Aroyan
@@ -18,7 +19,7 @@ public class PasswordEncoderConfiguration {
     private final PasswordEncoderProperties properties;
 
     @Bean
-    protected Argon2PasswordEncoder passwordEncoder() {
+    public Argon2PasswordEncoder passwordEncoder() {
         return new Argon2PasswordEncoder(
                 properties.saltLength(),
                 properties.hashLength(),
@@ -26,5 +27,10 @@ public class PasswordEncoderConfiguration {
                 properties.memory(),
                 properties.iterations()
         );
+    }
+
+    @Bean
+    public PasswordEncoderService passwordEncoderService(Argon2PasswordEncoder passwordEncoder) {
+        return new PasswordEncoderService(properties, passwordEncoder);
     }
 }
