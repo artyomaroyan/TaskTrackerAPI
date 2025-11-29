@@ -1,4 +1,4 @@
-package org.tasktracker.demo.mapper.generic;
+package org.tasktracker.demo.mapper;
 
 import reactor.core.publisher.Mono;
 
