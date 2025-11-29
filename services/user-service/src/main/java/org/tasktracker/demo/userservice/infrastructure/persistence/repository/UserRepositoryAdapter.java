@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import org.tasktracker.demo.userservice.application.mapper.UserMapper;
 import org.tasktracker.demo.userservice.domain.model.Email;
 import org.tasktracker.demo.userservice.domain.model.User;
-import org.tasktracker.demo.userservice.domain.repository.UserRepository;
-import org.tasktracker.demo.userservice.exception.DataAccessException;
-import org.tasktracker.demo.userservice.exception.UserExistenceException;
+import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
+import org.tasktracker.demo.userservice.application.exception.DataAccessException;
+import org.tasktracker.demo.userservice.domain.exception.UserExistenceException;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;

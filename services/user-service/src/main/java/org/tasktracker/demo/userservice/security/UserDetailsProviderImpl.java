@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.tasktracker.demo.userservice.domain.repository.UserRepository;
-import org.tasktracker.demo.userservice.security.interfaces.UserDetailsProvider;
+import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
+import org.tasktracker.demo.userservice.application.ports.out.UserDetailsProvider;
 import reactor.core.publisher.Mono;
 
 /**
