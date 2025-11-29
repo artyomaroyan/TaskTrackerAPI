@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.tasktracker.demo.userservice.application.ports.out.TokenProvider;
 import org.tasktracker.demo.userservice.security.BasicAuthenticationManager;
@@ -21,18 +20,17 @@ import org.tasktracker.demo.userservice.security.MultipleAuthenticationConverter
  */
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties({JwtProperties.class, PasswordEncoderProperties.class})
+@EnableConfigurationProperties(JwtProperties.class)
 public class BeanConfiguration {
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final PasswordEncoderProperties properties;
     private final ReactiveUserDetailsService userDetailsService;
 
     @Bean
     public ReactiveAuthenticationManager authenticationManager() {
         return new DelegatingReactiveAuthenticationManager(
-                jwtAuthenticationManager(),
-                basicAuthenticationManager()
+                basicAuthenticationManager(),
+                jwtAuthenticationManager()
         );
     }
 
@@ -49,16 +47,5 @@ public class BeanConfiguration {
     @Bean
     public MultipleAuthenticationConverter multipleAuthenticationConverter() {
         return new MultipleAuthenticationConverter();
-    }
-
-    @Bean
-    public Argon2PasswordEncoder passwordEncoder() {
-        return new Argon2PasswordEncoder(
-                properties.saltLength(),
-                properties.hashLength(),
-                properties.parallelism(),
-                properties.memory(),
-                properties.iterations()
-        );
     }
 }

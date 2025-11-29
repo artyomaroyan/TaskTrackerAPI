@@ -6,9 +6,10 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.tasktracker.demo.userservice.exception.TokenValidationException;
-import org.tasktracker.demo.userservice.security.interfaces.KeyProvider;
-import org.tasktracker.demo.userservice.security.interfaces.TokenProvider;
+import org.tasktracker.demo.userservice.application.exception.TokenValidationException;
+import org.tasktracker.demo.userservice.application.ports.out.KeyProvider;
+import org.tasktracker.demo.userservice.application.ports.out.TokenProvider;
+import org.tasktracker.demo.userservice.infrastructure.configuration.JwtProperties;
 import reactor.core.publisher.Mono;
 
 import java.util.*;

@@ -5,10 +5,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.tasktracker.demo.userservice.exception.UserNotFoundException;
+import org.tasktracker.demo.userservice.domain.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Author: Artyom Aroyan
@@ -42,10 +47,24 @@ public record BasicAuthenticationManager(
                 .switchIfEmpty(Mono.error(new UserNotFoundException("User not found!")))
                 .filter(userDetails -> passwordEncoder.matches(password, userDetails.getPassword()))
                 .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid credentials!")))
-                .map(userDetails -> new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                ));
+                .map(userDetails -> {
+                    UserIdentity userIdentity = new UserIdentity(
+                            userDetails.getUsername(),
+                            extractAuthorities(userDetails),
+                            userDetails.isEnabled()
+                    );
+
+                    return new UsernamePasswordAuthenticationToken(
+                            userIdentity,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                });
+    }
+
+    private Set<String> extractAuthorities(UserDetails userDetails) {
+        return userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
     }
 }

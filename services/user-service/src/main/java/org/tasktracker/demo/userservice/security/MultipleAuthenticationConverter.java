@@ -37,10 +37,14 @@ public class MultipleAuthenticationConverter implements ServerAuthenticationConv
     }
 
     private Mono<Authentication> createAuthenticationToken(String authHeader) {
-        if (authHeader.startsWith(BEARER_PREFIX)) {
-            String token = authHeader.substring(BEARER_PREFIX.length());
+        if (authHeader == null || authHeader.isBlank()) return Mono.empty();
+
+        String header = authHeader.trim();
+
+        if (header.regionMatches(true, 0, BEARER_PREFIX, 0, BEARER_PREFIX.length())) {
+            String token = header.substring(BEARER_PREFIX.length()).trim();
             return Mono.just(new BearerToken(token));
-        } else if (authHeader.startsWith(BASIC_PREFIX)) {
+        } else if (header.regionMatches(true, 0, BASIC_PREFIX, 0, BASIC_PREFIX.length())) {
             return extractBasicAuth(authHeader);
         }
         return Mono.empty();
