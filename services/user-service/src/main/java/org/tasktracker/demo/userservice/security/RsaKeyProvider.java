@@ -1,7 +1,8 @@
 package org.tasktracker.demo.userservice.security;
 
 import org.springframework.stereotype.Component;
-import org.tasktracker.demo.userservice.security.interfaces.KeyProvider;
+import org.tasktracker.demo.userservice.application.ports.out.KeyProvider;
+import org.tasktracker.demo.userservice.infrastructure.configuration.JwtProperties;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
