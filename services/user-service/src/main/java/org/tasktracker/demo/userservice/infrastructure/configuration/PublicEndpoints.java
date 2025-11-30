@@ -24,7 +24,7 @@ public final class PublicEndpoints {
             "/api/v1/user/login"
     };
 
-    static final String[] ALL = Stream.of(SWAGGER, JWKS, WHITELIST)
+    public static final String[] ALL = Stream.of(SWAGGER, JWKS, WHITELIST)
             .flatMap(Stream::of)
             .toArray(String[]::new);
 }
