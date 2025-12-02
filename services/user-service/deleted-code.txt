@@ -421,3 +421,45 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 }
 ------------------------------------------------------------------------------------------------------------------------
+    public Mono<Boolean> hasAuthority(String authority) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(authentication -> authentication.getAuthorities().stream()
+                        .anyMatch(auth -> auth.getAuthority().equals(authority)))
+                .defaultIfEmpty(false);
+    }
+
+    public Mono<UUID> getCurrentUserId() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .flatMap(authentication -> userRepository.findByUsername(authentication.getName())
+                        .map(User::getId));
+    }
+
+    public Mono<Boolean> isResourceOwner(UUID resourceId, String resourceType) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .flatMap(authentication -> {
+                    boolean isAdmin = authentication.getAuthorities().stream()
+                            .anyMatch(auth -> auth
+                                    .getAuthority().equals(SecurityConstants.ROLE_ADMIN));
+
+                    if (isAdmin) {
+                        return Mono.just(true);
+                    }
+
+                    return checkResourceOwnership(resourceId, resourceType, authentication.getName());
+                })
+                .defaultIfEmpty(false);
+    }
+
+    private Mono<Boolean> checkResourceOwnership(UUID resourceId, String resourceType, String username) {
+        return switch (resourceType) {
+            case "USER" -> userRepository.findById(resourceId)
+                    .map(user -> user.getUsername().equals(username))
+                    .defaultIfEmpty(false);
+            case "ADMIN" -> Mono.just(true);
+            default -> Mono.just(false);
+        };
+    }
+------------------------------------------------------------------------------------------------------------------------

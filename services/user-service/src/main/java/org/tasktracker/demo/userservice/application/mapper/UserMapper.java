@@ -31,7 +31,7 @@ public class UserMapper extends BaseMapper<User, UserEntity> {
                     entity.getPassword(),
                     new Email(entity.getEmail()),
                     Role.valueOf(entity.getRole()),
-                    Set.of(CREATE.name(), UPDATE.name(), DELETE.name()),
+                    Set.of(CREATE.name(), READ.name(), UPDATE.name(), DELETE.name()),
                     entity.getCreatedAt(),
                     entity.isActive());
         } catch (IllegalArgumentException ex) {
