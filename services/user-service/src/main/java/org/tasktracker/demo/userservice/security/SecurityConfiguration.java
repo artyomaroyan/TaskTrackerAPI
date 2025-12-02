@@ -41,14 +41,15 @@ class SecurityConfiguration {
         return httpSecurity
                 .csrf(csrf -> csrf.requireCsrfProtectionMatcher(csrfMatcher))
                 .cors(cors -> cors.configurationSource(configurationSource))
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+                .logout(ServerHttpSecurity.LogoutSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(PublicEndpoints.ALL)
                             .permitAll()
                         .anyExchange()
                             .authenticated()
                 )
-                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .addFilterAt(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
