@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     @Override
     @Transactional
+    @PreAuthorize("permitAll()")
     public Mono<User> register(@NotNull UserRequest request) {
         return validateRequest(request)
                 .flatMap(this::checkUserExistence)

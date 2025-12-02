@@ -2,6 +2,7 @@ package org.tasktracker.demo.userservice.application.usecases;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -31,6 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final ReactiveUserDetailsService userDetailsService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public Mono<String> login(AuthenticationRequest request) {
         log.debug("Processing login for user {}", request.username());
         return userDetailsService.findByUsername(request.username())
