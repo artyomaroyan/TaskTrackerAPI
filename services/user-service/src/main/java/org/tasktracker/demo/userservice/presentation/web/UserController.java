@@ -33,13 +33,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get/{userId}")
+    @GetMapping("/get/id/{userId}")
     ResponseEntity<Mono<User>> findUserById(@PathVariable UUID userId) {
         var response = userService.findUserById(userId);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get/{username}")
+    @GetMapping("/get/username/{username}")
     ResponseEntity<Mono<User>> findUserByUsername(@PathVariable String username) {
         var response = userService.findUserByUsername(username);
         return ResponseEntity.ok(response);
