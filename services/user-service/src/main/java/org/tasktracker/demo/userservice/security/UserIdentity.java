@@ -21,7 +21,7 @@ public record UserIdentity(
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities.stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
                 .collect(Collectors.toSet());
     }
 

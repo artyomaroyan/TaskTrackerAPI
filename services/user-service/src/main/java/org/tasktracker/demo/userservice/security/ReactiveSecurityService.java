@@ -25,8 +25,7 @@ public class ReactiveSecurityService {
                 .map(SecurityContext::getAuthentication)
                 .flatMap(authentication -> {
                     boolean isAdmin = authentication.getAuthorities().stream()
-                            .anyMatch(auth -> auth.
-                                    getAuthority().equals(SecurityConstants.ROLE_ADMIN));
+                            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
                     if (isAdmin) {
                         return Mono.just(true);

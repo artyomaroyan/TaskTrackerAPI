@@ -11,7 +11,8 @@ import org.tasktracker.demo.userservice.domain.model.Role;
 final class SecurityConstants {
     static final String ROLE_USER = Role.USER.name().toUpperCase();
     static final String ROLE_ADMIN = Role.ADMIN.name().toUpperCase();
+    static final String AUTHORITY_CREATE = Authorities.CREATE.name().toUpperCase();
     static final String AUTHORITY_READ = Authorities.READ.name().toUpperCase();
-    static final String AUTHORITY_WRITE = Authorities.CREATE.name().toUpperCase();
+    static final String AUTHORITY_UPDATE = Authorities.UPDATE.name().toUpperCase();
     static final String AUTHORITY_DELETE = Authorities.DELETE.name().toUpperCase();
 }
