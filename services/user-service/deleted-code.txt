@@ -463,3 +463,34 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         };
     }
 ------------------------------------------------------------------------------------------------------------------------
+// Custom annotations for better readability and reusability
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("hasRole('ADMIN')")
+public @interface IsAdmin { }
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+public @interface IsAuthenticated { }
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("@securityService.isSelfOrAdmin(#userId)")
+public @interface IsSelfOrAdmin {
+    String userId() default "#userId";
+}
+
+// Usage in services
+public interface UserService {
+
+    @IsSelfOrAdmin
+    Mono<User> findUserById(@NotNull UUID id);
+
+    @IsAdmin
+    Mono<Void> deleteUserById(@NotNull UUID id);
+
+    @IsAuthenticated
+    Mono<User> findUserByUsername(@NotBlank String username);
+}
+------------------------------------------------------------------------------------------------------------------------
