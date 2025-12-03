@@ -7,7 +7,10 @@ package org.tasktracker.demo.userservice.domain.model;
  */
 public enum Authorities {
     CREATE,
+    CREATE_SELF,
     READ,
     UPDATE,
+    UPDATE_SELF,
     DELETE,
+    MANAGE_USERS
 }
