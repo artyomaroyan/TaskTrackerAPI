@@ -30,7 +30,6 @@ public class UserEntity {
     private String password;
     private String email;
     private String role;
-    private Set<String> authorities;
     private Instant createdAt;
     private boolean active;
 }
