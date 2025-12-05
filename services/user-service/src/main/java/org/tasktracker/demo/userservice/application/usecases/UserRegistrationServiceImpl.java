@@ -9,20 +9,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;
+import org.tasktracker.demo.userservice.application.exception.DataAccessException;
+import org.tasktracker.demo.userservice.application.exception.RegistrationException;
 import org.tasktracker.demo.userservice.application.ports.in.UserRegistrationService;
+import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
+import org.tasktracker.demo.userservice.domain.exception.UserExistenceException;
 import org.tasktracker.demo.userservice.domain.model.Email;
 import org.tasktracker.demo.userservice.domain.model.Role;
 import org.tasktracker.demo.userservice.domain.model.User;
-import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
-import org.tasktracker.demo.userservice.application.exception.DataAccessException;
-import org.tasktracker.demo.userservice.application.exception.RegistrationException;
-import org.tasktracker.demo.userservice.domain.exception.UserExistenceException;
 import reactor.core.publisher.Mono;
 
-import java.util.Set;
 import java.util.regex.Pattern;
-
-import static org.tasktracker.demo.userservice.domain.model.Authorities.*;
 
 /**
  * Author: Artyom Aroyan
@@ -53,8 +50,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                     request.username(),
                     passwordEncoder.encode(request.password()),
                     new Email(request.email()),
-                    Set.of(CREATE.name(), READ.name(),  UPDATE.name(), DELETE.name()), // setting users authority logic should be improved!!!.
-                    Role.USER,
+                    Role.ADMIN,
                     true
             );
             return userRepository.save(newUser);
