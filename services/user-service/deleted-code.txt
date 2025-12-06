@@ -550,3 +550,31 @@ public class RoleAuthoritiesMapper {
 }
  */
 ------------------------------------------------------------------------------------------------------------------------
+public final class RolePermissions {
+
+    private static final Map<Role, Set<Authorities>> ROLE_TO_AUTHORITIES =
+            Map.of(
+                    Role.USER, Set.of(
+                            Authorities.READ,
+                            Authorities.UPDATE
+                    ),
+                    Role.ADMIN, Set.of(
+                            Authorities.CREATE,
+                            Authorities.READ,
+                            Authorities.UPDATE,
+                            Authorities.DELETE
+                    ),
+                    Role.TEAM_LEAD, Set.of(
+                            Authorities.READ,
+                            Authorities.UPDATE
+                    )
+            );
+
+    private RolePermissions() {}
+
+    public static Set<Authorities> getAuthorities(Role role) {
+        return ROLE_TO_AUTHORITIES.getOrDefault(role, Set.of());
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
