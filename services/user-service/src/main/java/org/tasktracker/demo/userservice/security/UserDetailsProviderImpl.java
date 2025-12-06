@@ -1,3 +1,4 @@
+/*
 package org.tasktracker.demo.userservice.security;
 
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import reactor.core.publisher.Mono;
  * Author: Artyom Aroyan
  * Date: 25.11.25
  * Time: 14:36:12
- */
+
 @Component
 @RequiredArgsConstructor
 public class UserDetailsProviderImpl implements UserDetailsProvider {
@@ -36,3 +37,4 @@ public class UserDetailsProviderImpl implements UserDetailsProvider {
                 .defaultIfEmpty(false);
     }
 }
+ */
