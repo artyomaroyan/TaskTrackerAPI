@@ -2,6 +2,7 @@ package org.tasktracker.demo.userservice.application.ports.in;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.tasktracker.demo.userservice.application.dto.UserResponse;
 import org.tasktracker.demo.userservice.domain.model.User;
 import reactor.core.publisher.Mono;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
  * Time: 21:45:27
  */
 public interface UserService {
-    Mono<User> findUserById(@NotNull UUID id);
-    Mono<User> findUserByUsername(@NotBlank String username);
+    Mono<UserResponse> findUserById(@NotNull UUID id);
+    Mono<UserResponse> findUserByUsername(@NotBlank String username);
     Mono<Void> deleteUserById(@NotNull UUID id);
 }

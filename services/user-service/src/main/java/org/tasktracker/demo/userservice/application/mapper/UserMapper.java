@@ -21,12 +21,12 @@ public class UserMapper extends BaseMapper<User, UserEntity> {
 
     public UserResponse toResponse(User user) {
         return new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail().value(),
-                user.getRole().name(),
-                user.getCreatedAt(),
-                user.isActive()
+                user.id(),
+                user.username(),
+                user.email().value(),
+                user.role().name(),
+                user.createdAt(),
+                user.active()
         );
     }
 
@@ -50,13 +50,13 @@ public class UserMapper extends BaseMapper<User, UserEntity> {
     @Override
     protected UserEntity mapToEntity(User domain) {
         return UserEntity.builder()
-                .id(domain.getId())
-                .username(domain.getUsername())
-                .password(domain.getPassword())
-                .email(domain.getEmail().value())
-                .role(domain.getRole().name())
-                .createdAt(domain.getCreatedAt())
-                .active(domain.isActive())
+                .id(domain.id())
+                .username(domain.username())
+                .password(domain.password())
+                .email(domain.email().value())
+                .role(domain.role().name())
+                .createdAt(domain.createdAt())
+                .active(domain.active())
                 .build();
     }
 }

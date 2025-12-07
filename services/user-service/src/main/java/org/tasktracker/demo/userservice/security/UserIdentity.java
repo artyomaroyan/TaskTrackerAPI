@@ -15,19 +15,20 @@ import java.util.stream.Collectors;
  */
 public record UserIdentity(
         String username,
+        String password,
         Set<String> authorities,
         boolean enabled) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override

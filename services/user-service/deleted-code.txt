@@ -578,3 +578,20 @@ public final class RolePermissions {
 }
 
 ------------------------------------------------------------------------------------------------------------------------
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof User that)) return false;
+        return Objects.equals(this.id, that.id) &&
+                Objects.equals(this.username, that.username) &&
+                Objects.equals(this.email, that.email) &&
+                Objects.equals(this.role, that.role) &&
+                Objects.equals(this.createdAt, that.createdAt) &&
+                Objects.equals(this.active, that.active);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, email, role, createdAt, active);
+    }
+------------------------------------------------------------------------------------------------------------------------
