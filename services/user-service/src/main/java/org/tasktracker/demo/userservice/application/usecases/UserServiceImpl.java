@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @reactiveSecurityService.isSelfOrAdmin(id)")
+    @PreAuthorize("hasRole('ADMIN') or @reactiveSecurityService.isSelfOrAdmin(#id)")
     public Mono<User> findUserById(UUID id) {
         log.debug("finding user by ID: {}", id);
         return userRepository.findById(id)
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('USER') or #username = authentication.principal.username")
+    @PreAuthorize("hasRole('USER') or #username == authentication.name")
     public Mono<User> findUserByUsername(String username) {
         log.debug("Finding user by username: {}", username);
         return userRepository.findByUsername(username)
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN') or hasAuthority('DELETE')")
+    @PreAuthorize("hasAnyRole('ADMIN') or hasAuthority('DELETE')")
     public Mono<Void> deleteUserById(UUID id) {
         log.debug("Deleting user by ID: {}", id);
         return this.findUserById(id)

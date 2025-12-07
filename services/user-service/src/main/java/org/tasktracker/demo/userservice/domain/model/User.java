@@ -3,9 +3,7 @@ package org.tasktracker.demo.userservice.domain.model;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -43,15 +41,10 @@ public class User {
     }
 
     public Set<String> getAuthorities() {
-        return this.role.getAuthoritiesAsString();
-    }
-
-    public boolean hasAuthority(Authorities authorities) {
-        return this.role.hasAuthority(authorities);
-    }
-
-    public boolean isAdmin() {
-        return this.role == Role.ADMIN;
+        Set<String> allAuthorities = new HashSet<>();
+        allAuthorities.add("ROLE_" + this.role.name());
+        allAuthorities.addAll(this.role.getAuthoritiesAsString());
+        return Collections.unmodifiableSet(allAuthorities);
     }
 
     @Override

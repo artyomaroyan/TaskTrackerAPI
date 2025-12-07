@@ -5,7 +5,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
-import org.tasktracker.demo.userservice.domain.model.User;
+import org.tasktracker.demo.userservice.domain.model.Role;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -25,7 +25,9 @@ public class ReactiveSecurityService {
                 .map(SecurityContext::getAuthentication)
                 .flatMap(authentication -> {
                     boolean isAdmin = authentication.getAuthorities().stream()
-                            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+                            .anyMatch(auth ->
+                                    auth.getAuthority().equals(Role.ADMIN.getAuthority())
+                            );
 
                     if (isAdmin) {
                         return Mono.just(true);
