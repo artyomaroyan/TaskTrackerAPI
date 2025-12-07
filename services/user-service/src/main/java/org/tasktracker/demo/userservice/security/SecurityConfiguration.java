@@ -63,17 +63,17 @@ class SecurityConfiguration {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(PublicEndpoints.ALL)
                             .permitAll()
-                        .pathMatchers(HttpMethod.GET, "api/v1/user/get/id/**")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/user/get/id/**")
                             .authenticated()
-                        .pathMatchers(HttpMethod.GET, "api/v1/user/get/username/**")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/user/get/username/**")
                             .authenticated()
-                        .pathMatchers(HttpMethod.DELETE, "api/v1/user/delete/**")
+                        .pathMatchers(HttpMethod.DELETE, "/api/v1/user/delete/**")
                             .authenticated()
                         .anyExchange()
                             .authenticated()
                 )
                 .authenticationManager(authenticationManager)
-                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+//                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .addFilterAt(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
