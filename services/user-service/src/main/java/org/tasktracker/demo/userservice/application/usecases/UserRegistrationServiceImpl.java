@@ -9,8 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;
+import org.tasktracker.demo.userservice.application.dto.UserResponse;
 import org.tasktracker.demo.userservice.application.exception.DataAccessException;
 import org.tasktracker.demo.userservice.application.exception.RegistrationException;
+import org.tasktracker.demo.userservice.application.mapper.UserMapper;
 import org.tasktracker.demo.userservice.application.ports.in.UserRegistrationService;
 import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
 import org.tasktracker.demo.userservice.domain.exception.UserExistenceException;
@@ -30,13 +32,14 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class UserRegistrationServiceImpl implements UserRegistrationService {
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     @PreAuthorize("permitAll()")
-    public Mono<User> register(@NotNull UserRequest request) {
+    public Mono<UserResponse> register(@NotNull UserRequest request) {
         return validateRequest(request)
                 .flatMap(this::checkUserExistence)
                 .flatMap(this::createAndSaveUser)
@@ -44,7 +47,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                         new RegistrationException("Registration failed", ex.getCause()));
     }
 
-    private Mono<User> createAndSaveUser(UserRequest request) {
+    private Mono<UserResponse> createAndSaveUser(UserRequest request) {
         try {
             User newUser = User.create(
                     request.username(),
@@ -53,7 +56,8 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                     Role.ADMIN,
                     true
             );
-            return userRepository.save(newUser);
+            return userRepository.save(newUser)
+                    .map(userMapper::toResponse);
         } catch (RegistrationException ex) {
             return Mono.error(new RegistrationException("Failed to register user", ex.getCause()));
         }

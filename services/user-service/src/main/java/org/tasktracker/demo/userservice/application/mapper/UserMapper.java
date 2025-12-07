@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.tasktracker.demo.exception.DataMappingException;
 import org.tasktracker.demo.mapper.BaseMapper;
+import org.tasktracker.demo.userservice.application.dto.UserResponse;
 import org.tasktracker.demo.userservice.domain.model.Email;
 import org.tasktracker.demo.userservice.domain.model.Role;
 import org.tasktracker.demo.userservice.domain.model.User;
@@ -17,6 +18,17 @@ import org.tasktracker.demo.userservice.infrastructure.persistence.entity.UserEn
 @Slf4j
 @Component
 public class UserMapper extends BaseMapper<User, UserEntity> {
+
+    public UserResponse toResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail().value(),
+                user.getRole().name(),
+                user.getCreatedAt(),
+                user.isActive()
+        );
+    }
 
     @Override
     protected User mapToDomain(UserEntity entity) {
