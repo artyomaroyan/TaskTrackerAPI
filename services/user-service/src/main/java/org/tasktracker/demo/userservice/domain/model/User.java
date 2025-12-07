@@ -1,31 +1,34 @@
 package org.tasktracker.demo.userservice.domain.model;
 
-import lombok.*;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.util.*;
 
 import static lombok.AccessLevel.PRIVATE;
+import static org.tasktracker.demo.userservice.domain.model.Role.USER;
 
 /**
  * Author: Artyom Aroyan
  * Date: 01.11.25
  * Time: 12:10:38
  */
-@Getter
 @Builder(access = PRIVATE)
-@AllArgsConstructor(access = PRIVATE)
-public class User {
-    private final UUID id;
-    private final String username;
-    private final String password;
-    private final Email email;
-    private final Role role;
-    private final Instant createdAt;
-    private final boolean active;
+public record User(UUID id, String username, String password, Email email,
+                   Role role, Instant createdAt, boolean active) {
 
-    public static User create(String username, String password, Email email, Role role, boolean active) {
-        return new User(null, username, password, email, role, Instant.now(), active);
+    public User(UUID id, String username, String password, Email email, Role role, Instant createdAt, boolean active) {
+        this.id = id;
+        this.username = Objects.requireNonNull(username, "Username cannot be null");
+        this.password = Objects.requireNonNull(password, "Password cannot be null");
+        this.email = Objects.requireNonNull(email, "Email cannot be null");
+        this.role = Objects.requireNonNull(role, "Role cannot be null");
+        this.createdAt = Objects.requireNonNull(createdAt, "CreatedAt cannot be null");
+        this.active = active;
+    }
+
+    public static User create(String username, String password, Email email) {
+        return new User(null, username, password, email, USER, Instant.now(), true);
     }
 
     public static User of(UUID id, String username, String password, Email email, Role role, Instant createdAt, boolean active) {
@@ -33,11 +36,11 @@ public class User {
     }
 
     public User changeEmail(Email newEmail) {
-        return new User(this.id, this.username, this.password, newEmail, this.role, this.createdAt, this.isActive());
+        return new User(this.id, this.username, this.password, newEmail, this.role, this.createdAt, this.active());
     }
 
     public User changeRole(Role newRole) {
-        return new User(this.id, this.username, this.password, this.email, newRole, this.createdAt, this.isActive());
+        return new User(this.id, this.username, this.password, this.email, newRole, this.createdAt, this.active());
     }
 
     public Set<String> getAuthorities() {
@@ -45,22 +48,5 @@ public class User {
         allAuthorities.add("ROLE_" + this.role.name());
         allAuthorities.addAll(this.role.getAuthoritiesAsString());
         return Collections.unmodifiableSet(allAuthorities);
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof User that)) return false;
-        return Objects.equals(this.id, that.id) &&
-                Objects.equals(this.username, that.username) &&
-                Objects.equals(this.email, that.email) &&
-                Objects.equals(this.role, that.role) &&
-                Objects.equals(this.createdAt, that.createdAt) &&
-                Objects.equals(this.active, that.active);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Objects.hash(id, username, email, role, createdAt, active);
     }
 }

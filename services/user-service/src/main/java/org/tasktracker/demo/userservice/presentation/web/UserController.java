@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tasktracker.demo.userservice.application.dto.AuthenticationRequest;
 import org.tasktracker.demo.userservice.application.dto.UserRequest;
+import org.tasktracker.demo.userservice.application.dto.UserResponse;
 import org.tasktracker.demo.userservice.application.ports.in.AuthenticationService;
 import org.tasktracker.demo.userservice.application.ports.in.UserRegistrationService;
 import org.tasktracker.demo.userservice.application.ports.in.UserService;
-import org.tasktracker.demo.userservice.domain.model.User;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -28,19 +28,19 @@ public class UserController {
     private final UserRegistrationService userRegistrationService;
 
     @PostMapping("/register")
-    ResponseEntity<Mono<User>> register(@Valid @RequestBody UserRequest request) {
+    ResponseEntity<Mono<UserResponse>> register(@Valid @RequestBody UserRequest request) {
         var response = userRegistrationService.register(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/get/id/{userId}")
-    ResponseEntity<Mono<User>> findUserById(@PathVariable UUID userId) {
+    ResponseEntity<Mono<UserResponse>> findUserById(@PathVariable UUID userId) {
         var response = userService.findUserById(userId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/get/username/{username}")
-    ResponseEntity<Mono<User>> findUserByUsername(@PathVariable String username) {
+    ResponseEntity<Mono<UserResponse>> findUserByUsername(@PathVariable String username) {
         var response = userService.findUserByUsername(username);
         return ResponseEntity.ok(response);
     }

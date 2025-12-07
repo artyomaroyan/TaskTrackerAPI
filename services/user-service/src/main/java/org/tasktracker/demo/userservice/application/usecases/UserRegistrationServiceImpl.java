@@ -52,9 +52,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
             User newUser = User.create(
                     request.username(),
                     passwordEncoder.encode(request.password()),
-                    new Email(request.email()),
-                    Role.ADMIN,
-                    true
+                    new Email(request.email())
             );
             return userRepository.save(newUser)
                     .map(userMapper::toResponse);

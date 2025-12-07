@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.tasktracker.demo.userservice.application.dto.UserResponse;
+import org.tasktracker.demo.userservice.application.mapper.UserMapper;
 import org.tasktracker.demo.userservice.application.ports.in.UserService;
-import org.tasktracker.demo.userservice.domain.model.User;
 import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
 import org.tasktracker.demo.userservice.domain.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
@@ -21,21 +22,24 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
 
     @Override
     @PreAuthorize("hasRole('ADMIN') or @reactiveSecurityService.isSelfOrAdmin(#id)")
-    public Mono<User> findUserById(UUID id) {
+    public Mono<UserResponse> findUserById(UUID id) {
         log.debug("finding user by ID: {}", id);
         return userRepository.findById(id)
+                .map(userMapper::toResponse)
                 .switchIfEmpty(Mono.error(new UserNotFoundException("User with id " + id + " not found")));
     }
 
     @Override
-    @PreAuthorize("hasRole('USER') or #username == authentication.name")
-    public Mono<User> findUserByUsername(String username) {
+    @PreAuthorize("hasRole('USER') or hasAuthority('READ')")
+    public Mono<UserResponse> findUserByUsername(String username) {
         log.debug("Finding user by username: {}", username);
         return userRepository.findByUsername(username)
+                .map(userMapper::toResponse)
                 .switchIfEmpty(Mono.error(new UserNotFoundException("User with username " + username + " not found")));
     }
 
