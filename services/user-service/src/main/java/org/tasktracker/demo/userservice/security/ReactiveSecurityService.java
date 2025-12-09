@@ -35,7 +35,7 @@ public class ReactiveSecurityService {
 
                     String currentUsername = authentication.getName();
                     return userRepository.findByUsername(currentUsername)
-                            .map(user -> user.getId().equals(userId))
+                            .map(user -> user.id().equals(userId))
                             .defaultIfEmpty(false);
                 })
                 .defaultIfEmpty(false);
