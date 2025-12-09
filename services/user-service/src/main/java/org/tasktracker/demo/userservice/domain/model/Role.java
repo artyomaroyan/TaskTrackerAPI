@@ -1,6 +1,5 @@
 package org.tasktracker.demo.userservice.domain.model;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,17 +20,13 @@ public enum Role {
         this.grantedAuthorities = grantedAuthorities;
     }
 
-    public Set<Authorities> getGrantedAuthorities() {
-        return Collections.unmodifiableSet(grantedAuthorities);
-    }
-
-    public boolean hasAuthority(Authorities authorities) {
-        return grantedAuthorities.contains(authorities);
-    }
-
     public Set<String> getAuthoritiesAsString() {
         return grantedAuthorities.stream()
                 .map(Enum::name)
                 .collect(Collectors.toSet());
+    }
+
+    public String getAuthority() {
+        return "ROLE_" + this.name();
     }
 }

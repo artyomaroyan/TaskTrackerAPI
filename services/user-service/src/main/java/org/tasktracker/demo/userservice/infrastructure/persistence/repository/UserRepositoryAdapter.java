@@ -47,21 +47,21 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public Mono<User> save(User user) {
-        log.debug("Saving user with ID: {}", user.getId());
+        log.debug("Saving user with ID: {}", user.id());
         return Mono.just(user)
                 .flatMap(userMapper::toEntity)
                 .flatMap(reactiveRepository::save)
                 .flatMap(userMapper::toDomain)
-                .doOnSuccess(saved -> log.debug("Successfully saved user with ID: {}", saved.getId()))
+                .doOnSuccess(saved -> log.debug("Successfully saved user with ID: {}", saved.id()))
                 .onErrorMap(DataAccessException.class, ex ->
-                        new UserExistenceException("Failed to save user with id: " + user.getId(), ex));
+                        new UserExistenceException("Failed to save user with id: " + user.id(), ex));
     }
 
     @Override
     public Mono<Boolean> existsByEmail(Email email) {
         log.debug("Checking email existence: {}", email.value());
         return reactiveRepository.existsByEmail(email.value())
-                .doOnSuccess(exists -> log.debug("Email {} exists {}", email.value(), exists))
+                .doOnSuccess(exists -> log.debug("Email {} exists ? {} ", email.value(), exists.toString().toUpperCase()))
                 .onErrorMap(DataAccessException.class, ex ->
                         new UserExistenceException("Failed to check email existence: " + email.value(), ex));
     }
