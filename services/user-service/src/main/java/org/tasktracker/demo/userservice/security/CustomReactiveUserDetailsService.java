@@ -32,13 +32,13 @@ public class CustomReactiveUserDetailsService implements ReactiveUserDetailsServ
                     return Mono.error(new UsernameNotFoundException("User not found: " + username));
                 }))
                 .map(user -> {
-                    log.debug("Found user: {}", user.getUsername());
+                    log.debug("Found user: {}", user.username());
 
                     return new UserIdentity(
-                            user.getUsername(),
-                            user.getPassword(),
+                            user.username(),
+                            user.password(),
                             user.getAuthorities(),
-                            user.isActive()
+                            user.active()
                     );
                 });
     }

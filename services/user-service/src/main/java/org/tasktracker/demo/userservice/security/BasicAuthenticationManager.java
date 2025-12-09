@@ -5,15 +5,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.tasktracker.demo.userservice.domain.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Author: Artyom Aroyan
@@ -48,23 +43,13 @@ public record BasicAuthenticationManager(
                 .filter(userDetails -> passwordEncoder.matches(password, userDetails.getPassword()))
                 .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid credentials!")))
                 .map(userDetails -> {
-                    UserIdentity userIdentity = new UserIdentity(
-                            userDetails.getUsername(),
-                            extractAuthorities(userDetails),
-                            userDetails.isEnabled()
-                    );
+                    UserIdentity userIdentity = (UserIdentity) userDetails;
 
                     return new UsernamePasswordAuthenticationToken(
                             userIdentity,
-                            null,
+                            userIdentity.getPassword(),
                             userDetails.getAuthorities()
                     );
                 });
-    }
-
-    private Set<String> extractAuthorities(UserDetails userDetails) {
-        return userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
     }
 }
