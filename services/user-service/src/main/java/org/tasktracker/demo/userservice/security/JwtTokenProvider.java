@@ -86,6 +86,7 @@ public class JwtTokenProvider implements TokenProvider {
 
             return new UserIdentity(
                     username,
+                    null,
                     authorities,
                     true
             );

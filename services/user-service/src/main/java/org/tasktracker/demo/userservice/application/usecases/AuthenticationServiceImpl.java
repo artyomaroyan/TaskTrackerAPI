@@ -58,6 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
                     return new UserIdentity(
                             request.username(),
+                            request.password(),
                             authorities,
                             userDetails.isEnabled()
                     );
