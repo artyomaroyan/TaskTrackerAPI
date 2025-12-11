@@ -64,14 +64,14 @@ logging:
       springframework:
         security:
           web: info
-          core: info
+          core: trace
           access: info
-          authentication: info
+          authentication: trace
           authorization: info
-        _: info
+        _: trace
         web:
-          reactive: info
-          _: info
+          reactive: trace
+          _: trace
     reactor:
       netty:
         http:
