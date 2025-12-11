@@ -595,3 +595,168 @@ public final class RolePermissions {
         return Objects.hash(id, username, email, role, createdAt, active);
     }
 ------------------------------------------------------------------------------------------------------------------------
+    @Override
+    public Mono<Authentication> convert(ServerWebExchange exchange) {
+        return extractAuthHeader(exchange)
+                .flatMap(this::createAuthenticationToken)
+                .switchIfEmpty(Mono.empty());
+    }
+
+    private Mono<String> extractAuthHeader(ServerWebExchange exchange) {
+        return Mono.justOrEmpty(exchange.getRequest()
+                .getHeaders()
+                .getFirst(AUTHORIZATION));
+    }
+
+    private Mono<Authentication> createAuthenticationToken(String authHeader) {
+        if (authHeader == null || authHeader.isBlank()) return Mono.empty();
+
+        String header = authHeader.trim();
+
+        if (header.regionMatches(true, 0, BEARER_PREFIX, 0, BEARER_PREFIX.length())) {
+            String token = header.substring(BEARER_PREFIX.length()).trim();
+            return Mono.just(new BearerToken(token));
+        } else if (header.regionMatches(true, 0, BASIC_PREFIX, 0, BASIC_PREFIX.length())) {
+            return extractBasicAuth(authHeader);
+        }
+        return Mono.empty();
+    }
+
+    private Mono<Authentication> extractBasicAuth(String authHeader) {
+        return Mono.fromCallable(() -> {
+                    String base64Credentials = authHeader.substring(BASIC_PREFIX.length()).trim();
+                    byte[] decoded = Base64.getDecoder().decode(base64Credentials);
+                    String credentials = new String(decoded, StandardCharsets.UTF_8);
+
+                    final String[] values = credentials.split(":", 2);
+
+                    if (values.length != 2) throw new AuthenticationException("Invalid basic authentication format");
+
+                    String username = values[0];
+                    String password = values[1];
+
+                    log.debug("Basic Auth attempt for user: {}", username);
+
+                    return new UsernamePasswordAuthenticationToken(username, password);
+                }).cast(Authentication.class)
+                .onErrorResume(error -> {
+                    log.warn("Basic authentication extraction failed: {}", error.getMessage());
+                    return Mono.empty();
+                });
+    }
+------------------------------------------------------------------------------------------------------------------------
+    @Override
+    public Mono<Authentication> authenticate(Authentication authentication) {
+        log.debug("DelegatingReactiveAuthenticationManager: Processing authentication type: {}",
+                authentication != null ? authentication.getClass().getSimpleName() : "Authentication not found");
+
+        if (authentication == null) {
+            return Mono.error(new AuthenticationException("Authentication object is null"));
+        }
+
+        log.debug("DelegatingReactiveAuthenticationManager: Authentication details - Name: {}, Authenticated: {}",
+                authentication.getName(), authentication.isAuthenticated());
+
+        return Flux.fromIterable(authenticationManagers)
+                .doOnNext(manager -> log.debug("Trying authentication manager: {}",
+                        manager.getClass().getSimpleName()))
+                .concatMap(manager -> manager.authenticate(authentication)
+                        .doOnNext(_ -> log.debug("Manager {} successfully authenticated",
+                                manager.getClass().getSimpleName()))
+                        .onErrorResume(error -> {
+                            log.debug("Authentication manager {} can not process: {}",
+                                    manager.getClass().getSimpleName(), error.getMessage());
+
+                            return Mono.empty();
+                        }))
+                .next()
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("No authentication manager could process the request. Authentication type: {}",
+                            authentication.getClass().getSimpleName());
+                    return Mono.error(new AuthenticationException("No authentication manager could process the request:"));
+                }));
+    }
+------------------------------------------------------------------------------------------------------------------------
+    @Override
+    public Mono<Authentication> authenticate(Authentication authentication) {
+        return Mono.just(authentication)
+                .filter(auth -> auth instanceof UsernamePasswordAuthenticationToken)
+                .cast(UsernamePasswordAuthenticationToken.class)
+                .switchIfEmpty(Mono.empty())
+                .flatMap(this::authenticateBasic)
+                .doOnError(error -> log.warn("Basic authentication failed: {}", error.getMessage()));
+    }
+
+    private Mono<Authentication> authenticateBasic(UsernamePasswordAuthenticationToken authenticationToken) {
+        String username = authenticationToken.getName();
+        String password = authenticationToken.getCredentials().toString();
+
+        if (username == null || password == null) {
+            return Mono.error(new BadCredentialsException("Username or password can not be null!"));
+        }
+
+        return userDetailsService.findByUsername(username)
+                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found!")))
+                .filter(userDetails -> passwordEncoder.matches(password, userDetails.getPassword()))
+                .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid credentials!")))
+                .map(userDetails -> {
+                    UserIdentity userIdentity = (UserIdentity) userDetails;
+
+                    return new UsernamePasswordAuthenticationToken(
+                            userIdentity,
+                            userIdentity.getPassword(),
+                            userDetails.getAuthorities()
+                    );
+                });
+    }
+------------------------------------------------------------------------------------------------------------------------
+    @Override
+    @PreAuthorize("permitAll()")
+    public Mono<String> login(AuthenticationRequest request) {
+        log.debug("Processing login for user {}", request.username());
+        return userDetailsService.findByUsername(request.username())
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.debug("User not found: {}", request.username());
+                    return Mono.error(new UserNotFoundException("User not found: " + request.username()));
+                }))
+                .filter(userDetails -> {
+                    boolean matches = passwordEncoder.matches(request.password(), userDetails.getPassword());
+                    if (!matches) {
+                        log.debug("Password mismatch for user: {}", request.username());
+                    }
+                     return matches;
+                })
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.debug("Invalid credentials for user: {}", request.username());
+                    return Mono.error(new BadCredentialsException("Invalid credentials"));
+                }))
+                .map(userDetails -> {
+                    Set<String> authorities = userDetails.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.toSet());
+
+                    return new UserIdentity(
+                            request.username(),
+                            request.password(),
+                            authorities.stream(),
+                            userDetails.isEnabled()
+                    );
+                })
+                .flatMap(tokenProvider::generateAccessToken)
+                .doOnSuccess(_ -> log.debug("Successfully longed in: {}", request.username()))
+                .doOnError(error -> log.error("Login failed for user: {}: {}", request.username(), error.getMessage()));
+    }
+------------------------------------------------------------------------------------------------------------------------
+    private ServerWebExchangeMatcher requiresAuthenticationMatcher() {
+        List<ServerWebExchangeMatcher> publicMatchers = Arrays.stream(PublicEndpoints.ALL)
+                .map(PathPatternParserServerWebExchangeMatcher::new)
+                .collect(Collectors.toUnmodifiableList());
+
+        OrServerWebExchangeMatcher publicOrMatcher = new OrServerWebExchangeMatcher(publicMatchers);
+
+        return exchange -> publicOrMatcher.matches(exchange)
+                .flatMap(result -> result.isMatch()
+                        ? ServerWebExchangeMatcher.MatchResult.notMatch()
+                        : ServerWebExchangeMatcher.MatchResult.match());
+    }
+------------------------------------------------------------------------------------------------------------------------
