@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    @PreAuthorize("hasRole('ADMIN') or @reactiveSecurityService.isSelfOrAdmin(#id)")
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<UserResponse> findUserById(UUID id) {
         log.debug("finding user by ID: {}", id);
         return userRepository.findById(id)

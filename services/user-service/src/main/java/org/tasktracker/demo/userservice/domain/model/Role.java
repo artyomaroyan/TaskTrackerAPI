@@ -25,8 +25,4 @@ public enum Role {
                 .map(Enum::name)
                 .collect(Collectors.toSet());
     }
-
-    public String getAuthority() {
-        return "ROLE_" + this.name();
-    }
 }

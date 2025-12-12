@@ -29,7 +29,7 @@ public class UserEntity {
     private String username;
     private String password;
     private String email;
-    private String role;
+    private Set<String> role;
     private Instant createdAt;
     private boolean active;
 }

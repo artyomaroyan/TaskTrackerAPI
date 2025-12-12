@@ -1,5 +1,6 @@
 package org.tasktracker.demo.userservice.application.ports.out;
 
+import org.springframework.security.core.Authentication;
 import org.tasktracker.demo.userservice.security.UserIdentity;
 import reactor.core.publisher.Mono;
 
@@ -10,7 +11,5 @@ import reactor.core.publisher.Mono;
  */
 public interface TokenProvider {
     Mono<String> generateAccessToken(UserIdentity user);
-    Mono<UserIdentity> extractUserIdentity(String token);
     Mono<Boolean> validateToken(String token);
-    Mono<Boolean> isTokenExpired(String token);
 }

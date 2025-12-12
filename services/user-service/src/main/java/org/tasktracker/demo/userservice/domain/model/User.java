@@ -4,6 +4,7 @@ import lombok.Builder;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static lombok.AccessLevel.PRIVATE;
 import static org.tasktracker.demo.userservice.domain.model.Role.USER;
@@ -15,9 +16,9 @@ import static org.tasktracker.demo.userservice.domain.model.Role.USER;
  */
 @Builder(access = PRIVATE)
 public record User(UUID id, String username, String password, Email email,
-                   Role role, Instant createdAt, boolean active) {
+                   Set<Role> role, Instant createdAt, boolean active) {
 
-    public User(UUID id, String username, String password, Email email, Role role, Instant createdAt, boolean active) {
+    public User(UUID id, String username, String password, Email email, Set<Role> role, Instant createdAt, boolean active) {
         this.id = id;
         this.username = Objects.requireNonNull(username, "Username cannot be null");
         this.password = Objects.requireNonNull(password, "Password cannot be null");
@@ -28,10 +29,10 @@ public record User(UUID id, String username, String password, Email email,
     }
 
     public static User create(String username, String password, Email email) {
-        return new User(null, username, password, email, USER, Instant.now(), true);
+        return new User(null, username, password, email, Set.of(USER), Instant.now(), true);
     }
 
-    public static User of(UUID id, String username, String password, Email email, Role role, Instant createdAt, boolean active) {
+    public static User of(UUID id, String username, String password, Email email, Set<Role> role, Instant createdAt, boolean active) {
         return new User(id, username, password, email, role, createdAt, active);
     }
 
@@ -40,13 +41,13 @@ public record User(UUID id, String username, String password, Email email,
     }
 
     public User changeRole(Role newRole) {
-        return new User(this.id, this.username, this.password, this.email, newRole, this.createdAt, this.active());
+        return new User(this.id, this.username, this.password, this.email, Set.of(newRole), this.createdAt, this.active());
     }
 
     public Set<String> getAuthorities() {
-        Set<String> allAuthorities = new HashSet<>();
-        allAuthorities.add("ROLE_" + this.role.name());
-        allAuthorities.addAll(this.role.getAuthoritiesAsString());
-        return Collections.unmodifiableSet(allAuthorities);
+        return role.stream()
+                .map(Role::getAuthoritiesAsString)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
     }
 }
