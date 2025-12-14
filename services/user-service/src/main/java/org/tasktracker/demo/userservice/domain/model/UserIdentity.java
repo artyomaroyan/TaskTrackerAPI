@@ -1,11 +1,11 @@
-package org.tasktracker.demo.userservice.security;
+package org.tasktracker.demo.userservice.domain.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.tasktracker.demo.userservice.domain.model.Role;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 public record UserIdentity(
         String username,
         String password,
-        Set<Role> roles,
+        String roles,
         Set<String> authorities,
         boolean enabled) implements UserDetails {
 
-    public UserIdentity(String username, String password, Set<Role> roles, Set<String> authorities, boolean enabled) {
+    public UserIdentity(String username, String password, String roles, Set<String> authorities, boolean enabled) {
         this.username = Objects.requireNonNull(username);
         this.password = password;
         this.roles = Objects.requireNonNull(roles);
@@ -32,9 +32,23 @@ public record UserIdentity(
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities.stream()
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+
+        if (roles != null && !roles.isEmpty()) {
+            String[] roleArray = roles.split(",");
+            for (String role : roleArray) {
+                role = role.trim();
+                if (!role.isEmpty()) {
+                    grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+                }
+            }
+        }
+
+        grantedAuthorities.addAll(authorities.stream()
                 .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toUnmodifiableSet()));
+
+        return grantedAuthorities;
     }
 
     @Override
