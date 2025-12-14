@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
-import java.util.Set;
 import java.util.UUID;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -29,7 +28,7 @@ public class UserEntity {
     private String username;
     private String password;
     private String email;
-    private Set<String> role;
+    private String role;
     private Instant createdAt;
     private boolean active;
 }

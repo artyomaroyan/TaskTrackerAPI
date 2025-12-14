@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
 import org.tasktracker.demo.userservice.domain.exception.UserNotFoundException;
-import org.tasktracker.demo.userservice.security.UserIdentity;
 import reactor.core.publisher.Mono;
 
 /**
@@ -27,8 +26,8 @@ public class CustomUserDetailsService implements ReactiveUserDetailsService {
                 .switchIfEmpty(Mono.error(new UserNotFoundException("User not found!")))
                 .map(user -> new UserIdentity(
                         user.username(),
-                        null,
-                        user.role(),
+                        user.password(),
+                        user.role().name(),
                         user.getAuthorities(),
                         user.active()
                 ));

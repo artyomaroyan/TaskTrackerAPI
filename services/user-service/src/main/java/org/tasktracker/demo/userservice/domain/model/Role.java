@@ -22,7 +22,7 @@ public enum Role {
 
     public Set<String> getAuthoritiesAsString() {
         return grantedAuthorities.stream()
-                .map(Enum::name)
+                .map(Authorities::name)
                 .collect(Collectors.toSet());
     }
 }
