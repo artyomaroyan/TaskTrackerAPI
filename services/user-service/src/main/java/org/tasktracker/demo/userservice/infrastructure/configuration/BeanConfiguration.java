@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.authentication.DelegatingReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.tasktracker.demo.userservice.application.ports.out.TokenProvider;
-import org.tasktracker.demo.userservice.security.BasicAuthenticationManager;
-import org.tasktracker.demo.userservice.security.DelegatingReactiveAuthenticationManager;
-import org.tasktracker.demo.userservice.security.JwtAuthenticationManager;
-import org.tasktracker.demo.userservice.security.MultipleAuthenticationConverter;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 
 /**
  * Author: Artyom Aroyan
@@ -22,30 +20,25 @@ import org.tasktracker.demo.userservice.security.MultipleAuthenticationConverter
 @RequiredArgsConstructor
 @EnableConfigurationProperties(JwtProperties.class)
 public class BeanConfiguration {
-    private final TokenProvider tokenProvider;
-    private final PasswordEncoder passwordEncoder;
-    private final ReactiveUserDetailsService userDetailsService;
 
     @Bean
-    public ReactiveAuthenticationManager authenticationManager() {
-        return new DelegatingReactiveAuthenticationManager(
-                basicAuthenticationManager(),
-                jwtAuthenticationManager()
-        );
+    @Primary
+    protected ReactiveAuthenticationManager jwtAuthenticationManager(JwtReactiveAuthenticationManager manager) {
+        return new DelegatingReactiveAuthenticationManager(manager);
     }
 
     @Bean
-    public JwtAuthenticationManager jwtAuthenticationManager() {
-        return new JwtAuthenticationManager(tokenProvider);
+    protected JwtReactiveAuthenticationManager jwtReactiveAuthenticationManager(ReactiveJwtDecoder decoder) {
+        return new JwtReactiveAuthenticationManager(decoder);
     }
 
     @Bean
-    public BasicAuthenticationManager basicAuthenticationManager() {
-        return new BasicAuthenticationManager(passwordEncoder, userDetailsService);
+    protected AuthenticationWebFilter jwtAuthenticationFilter() {
+        return new AuthenticationWebFilter(jwtAuthenticationManager(jwtReactiveAuthenticationManager(jwtDecoder())));
     }
 
     @Bean
-    public MultipleAuthenticationConverter multipleAuthenticationConverter() {
-        return new MultipleAuthenticationConverter();
+    protected ReactiveJwtDecoder jwtDecoder() {
+        return null;
     }
 }
