@@ -19,7 +19,7 @@ import java.util.Base64;
  * Time: 20:37:36
  */
 @Component
-public class RsaKeyProvider implements KeyProvider {
+final class RsaKeyProvider implements KeyProvider {
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 

@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -42,29 +40,17 @@ class SecurityConfiguration {
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint((exchange, _) ->
-                                Mono.fromRunnable(() -> {
-                                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                                    exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                                }))
-                        .accessDeniedHandler((exchange, _) ->
-                                Mono.fromRunnable(() -> {
-                                    exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                                    exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                                }))
-                )
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(PublicEndpoints.ALL)
-                        .permitAll()
+                            .permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/v1/user/get/id/**")
-                        .authenticated()
+                            .hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/user/get/username/**")
-                        .authenticated()
+                            .hasAuthority("READ")
                         .pathMatchers(HttpMethod.DELETE, "/api/v1/user/delete/**")
-                        .authenticated()
+                            .hasAuthority("DELETE")
                         .anyExchange()
-                        .authenticated()
+                            .authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
