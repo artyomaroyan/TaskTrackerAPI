@@ -9,6 +9,8 @@ import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
 import org.tasktracker.demo.userservice.domain.exception.UserNotFoundException;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 /**
  * Author: Artyom Aroyan
  * Date: 24.11.25
@@ -23,13 +25,23 @@ public class CustomUserDetailsService implements ReactiveUserDetailsService {
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found!")))
-                .map(user -> new UserIdentity(
-                        user.username(),
-                        user.password(),
-                        user.role().name(),
-                        user.getAuthorities(),
-                        user.active()
-                ));
+                .switchIfEmpty(Mono.error(new UserNotFoundException(
+                        String.format("User with username %s not found!", username))))
+                .map(this::toUserIdentity)
+                .cast(UserDetails.class)
+                .doOnError(error -> log.error("Error loading user: {}", username, error));
+    }
+
+    private UserIdentity toUserIdentity(User user) {
+        Set<Role> roles = Set.of(user.role());
+        Set<String> authorities = user.getAuthorities();
+
+        return new UserIdentity(
+                user.username(),
+                user.password(),
+                roles,
+                authorities,
+                user.active()
+        );
     }
 }
