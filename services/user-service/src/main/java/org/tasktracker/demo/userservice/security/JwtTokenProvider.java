@@ -11,13 +11,16 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import org.tasktracker.demo.userservice.application.ports.out.KeyProvider;
 import org.tasktracker.demo.userservice.application.ports.out.TokenProvider;
+import org.tasktracker.demo.userservice.domain.model.Role;
 import org.tasktracker.demo.userservice.domain.model.UserIdentity;
 import org.tasktracker.demo.userservice.infrastructure.configuration.JwtProperties;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Author: Artyom Aroyan
@@ -45,50 +48,49 @@ final class JwtTokenProvider implements TokenProvider {
                     Date now = new Date();
                     Date exp = new Date(now.getTime() + jwtProperties.expiration());
 
+                    Set<String> roleName = user.roles().stream()
+                            .map(Role::name)
+                            .collect(Collectors.toUnmodifiableSet());
+
                     return Jwts.builder()
                             .id(UUID.randomUUID().toString())
                             .subject(user.getUsername())
                             .issuer(jwtProperties.issuer())
                             .issuedAt(now)
                             .expiration(exp)
-                            .claim("roles", user.roles())
+                            .claim("roles", roleName)
                             .claim("authorities", user.authorities())
                             .signWith(keyProvider.getPrivateKey(), Jwts.SIG.RS256)
                             .compact();
                 })
                 .subscribeOn(scheduler)
+                .doOnSuccess(_ -> log.debug("Token successfully generated."))
                 .doOnError(error -> log.error("Token generation failed for user {}", user.username(), error));
     }
 
     @Override
     public Mono<Boolean> validateToken(String token) {
-        return Mono.fromCallable(() -> {
-            try {
-                Claims claims = jwtParser.parseSignedClaims(token)
-                        .getPayload();
-                return !claims.getExpiration().before(new Date());
-            } catch (JwtException | IllegalArgumentException ex) {
-                log.debug("Token validation failed: {}", ex.getMessage());
-                return false;
-            }
-        }).subscribeOn(scheduler);
+        return extractClaims(token)
+                .map(claims -> !claims.getExpiration().before(new Date()))
+                .onErrorReturn(false)
+                .doOnError(error -> log.debug("Token validation failed: {}", error.getMessage()));
     }
 
     @Override
     public Mono<String> extractUsername(String token) {
         return extractClaims(token)
-                .map(Claims::getSubject);
+                .map(Claims::getSubject)
+                .onErrorResume(JwtException.class,
+                        ex -> Mono.error(new BadCredentialsException("Invalid token", ex)));
     }
 
     @Override
     public Mono<Claims> extractClaims(String token) {
-        return Mono.fromCallable(() -> {
-            try {
-                return jwtParser.parseSignedClaims(token).getPayload();
-            } catch (JwtException ex) {
-                throw new BadCredentialsException("Invalid token", ex);
-            }
-        }).subscribeOn(scheduler);
+        return Mono.fromCallable(() -> jwtParser.parseSignedClaims(token).getPayload())
+                .subscribeOn(scheduler)
+                .onErrorMap(JwtException.class,
+                        ex -> new BadCredentialsException("Invalid token", ex));
+
     }
 
     private void refreshJwtParser() {
