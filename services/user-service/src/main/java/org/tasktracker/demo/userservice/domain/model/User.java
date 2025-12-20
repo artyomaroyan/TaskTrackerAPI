@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static lombok.AccessLevel.PRIVATE;
-import static org.tasktracker.demo.userservice.domain.model.Role.USER;
+import static org.tasktracker.demo.userservice.domain.model.Role.ADMIN;
 
 /**
  * Author: Artyom Aroyan
@@ -30,19 +30,11 @@ public record User(UUID id, String username, String password, Email email,
     }
 
     public static User create(String username, String password, Email email) {
-        return new User(null, username, password, email, USER, Instant.now(), true);
+        return new User(null, username, password, email, ADMIN, Instant.now(), true);
     }
 
     public static User of(UUID id, String username, String password, Email email, Role role, Instant createdAt, boolean active) {
         return new User(id, username, password, email, role, createdAt, active);
-    }
-
-    public User changeEmail(Email newEmail) {
-        return new User(this.id, this.username, this.password, newEmail, this.role, this.createdAt, this.active());
-    }
-
-    public User changeRole(Role newRole) {
-        return new User(this.id, this.username, this.password, this.email, newRole, this.createdAt, this.active());
     }
 
     public Set<String> getAuthorities() {
