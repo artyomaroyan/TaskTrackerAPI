@@ -1,13 +1,10 @@
 package org.tasktracker.demo.userservice.domain.model;
 
-import lombok.Builder;
-
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import static lombok.AccessLevel.PRIVATE;
 import static org.tasktracker.demo.userservice.domain.model.Role.ADMIN;
 
 /**
@@ -15,7 +12,6 @@ import static org.tasktracker.demo.userservice.domain.model.Role.ADMIN;
  * Date: 01.11.25
  * Time: 12:10:38
  */
-@Builder(access = PRIVATE)
 public record User(UUID id, String username, String password, Email email,
                    Role role, Instant createdAt, boolean active) {
 
