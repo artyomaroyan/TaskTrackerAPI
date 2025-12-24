@@ -1,7 +1,10 @@
 package org.tasktracker.demo.taskservice.infrastructure.persistence.repository;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.infrastructure.persistence.entity.TaskEntity;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -11,4 +14,6 @@ import java.util.UUID;
  * Time: 21:55:06
  */
 public interface TaskReactiveRepository extends ReactiveCrudRepository<TaskEntity, UUID> {
+    Mono<TaskEntity> findByTitle(String title);
+    Mono<TaskEntity> findByAssigneeId(UUID assigneeId);
 }
