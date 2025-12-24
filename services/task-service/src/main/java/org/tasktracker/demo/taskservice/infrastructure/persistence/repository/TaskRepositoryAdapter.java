@@ -3,16 +3,17 @@ package org.tasktracker.demo.taskservice.infrastructure.persistence.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.tasktracker.demo.taskservice.application.mapper.TaskMapper;
 import org.tasktracker.demo.taskservice.domain.exception.DataReadingException;
 import org.tasktracker.demo.taskservice.domain.exception.DataSavingException;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.domain.repository.TaskRepository;
+import org.tasktracker.demo.taskservice.infrastructure.persistence.entity.TaskEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 /**
@@ -59,9 +60,13 @@ public class TaskRepositoryAdapter implements TaskRepository {
     }
 
     @Override
-    public Flux<Task> findAllTasks(Pageable pageable) {
+    public Flux<Task> findAllTasks() {
         return reactiveRepository.findAll()
-                .flatMap(taskMapper::toDomain);
+                .sort(Comparator.comparing(TaskEntity::getCreatedAt))
+                .flatMap(taskMapper::toDomain)
+                .doOnComplete(() -> log.debug("Tasks fetch successfully."))
+                .onErrorMap(DataAccessException.class, ex ->
+                         new DataReadingException("Unable to load all tasks", ex.getCause()));
     }
 
     @Override

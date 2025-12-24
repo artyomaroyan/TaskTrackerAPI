@@ -1,6 +1,5 @@
 package org.tasktracker.demo.taskservice.domain.repository;
 
-import org.springframework.data.domain.Pageable;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,6 +15,6 @@ public interface TaskRepository {
     Mono<Task> save(Task task);
     Mono<Task> findTaskById(UUID taskId);
     Mono<Task> findTaskByTitle(String title);
-    Flux<Task> findAllTasks(Pageable pageable);
+    Flux<Task> findAllTasks();
     Mono<Task> findTaskByAssigneeId(UUID assigneeId);
 }
