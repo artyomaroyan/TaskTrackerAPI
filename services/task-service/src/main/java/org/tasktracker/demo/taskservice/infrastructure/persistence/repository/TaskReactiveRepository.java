@@ -1,9 +1,7 @@
 package org.tasktracker.demo.taskservice.infrastructure.persistence.repository;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.infrastructure.persistence.entity.TaskEntity;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
