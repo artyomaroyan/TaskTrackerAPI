@@ -2,8 +2,12 @@ package org.tasktracker.demo.taskservice.infrastructure.persistence.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.tasktracker.demo.taskservice.application.mapper.TaskMapper;
+import org.tasktracker.demo.taskservice.domain.exception.DataReadingException;
+import org.tasktracker.demo.taskservice.domain.exception.DataSavingException;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.domain.repository.TaskRepository;
 import reactor.core.publisher.Flux;
@@ -20,32 +24,52 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class TaskRepositoryAdapter implements TaskRepository {
+    private final TaskMapper taskMapper;
     private final TaskReactiveRepository reactiveRepository;
 
     @Override
     public Mono<Task> save(Task task) {
-        log.debug("Creating task with ID: {}", task.getId());
+        log.debug("Creating task with ID: {}", task.id());
         return Mono.just(task)
-                ;
+                .flatMap(taskMapper::toEntity)
+                .flatMap(reactiveRepository::save)
+                .flatMap(taskMapper::toDomain)
+                .doOnSuccess(saved -> log.debug("Task {} was successfully saved.", saved.id()))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataSavingException("Failed to create task with id: " + task.id(), ex));
     }
 
     @Override
     public Mono<Task> findTaskById(UUID taskId) {
-        return null;
+        log.debug("Finding task with ID {}", taskId);
+        return reactiveRepository.findById(taskId)
+                .flatMap(taskMapper::toDomain)
+                .doOnSuccess(_ -> log.debug("Found task with ID: {}", taskId))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataReadingException("Failed to find task with ID: " + taskId, ex));
     }
 
     @Override
     public Mono<Task> findTaskByTitle(String title) {
-        return null;
+        return reactiveRepository.findByTitle(title)
+                .flatMap(taskMapper::toDomain)
+                .doOnSuccess(_ -> log.debug("Found task by title: {}", title))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataReadingException("Failed to found task with title: " + title, ex));
     }
 
     @Override
     public Flux<Task> findAllTasks(Pageable pageable) {
-        return null;
+        return reactiveRepository.findAll()
+                .flatMap(taskMapper::toDomain);
     }
 
     @Override
     public Mono<Task> findTaskByAssigneeId(UUID assigneeId) {
-        return null;
+        return reactiveRepository.findByAssigneeId(assigneeId)
+                .flatMap(taskMapper::toDomain)
+                .doOnSuccess(_ -> log.debug("Found task by assignee ID: {}", assigneeId))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataReadingException("failed to found task with assignee ID: " + assigneeId, ex));
     }
 }

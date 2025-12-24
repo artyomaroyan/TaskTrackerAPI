@@ -31,4 +31,5 @@ public class TaskEntity {
     private Priority priority;
     private Instant createdAt;
     private Instant updatedAt;
+    private Instant dueDate;
 }
