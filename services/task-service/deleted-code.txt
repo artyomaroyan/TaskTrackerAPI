@@ -1,0 +1,23 @@
+public static Task update(Task existing,
+                         UUID assigneeId,
+                         String title,
+                         String description,
+                         Status status,
+                         Priority priority,
+                         Instant dueDate) {
+
+    return new Task(
+            existing.id,
+            Optional.ofNullable(assigneeId).orElse(existing.assigneeId),
+            Optional.ofNullable(title).orElse(existing.title),
+            Optional.ofNullable(description).orElse(existing.description),
+            Optional.ofNullable(status).orElse(existing.status),
+            Optional.ofNullable(priority).orElse(existing.priority),
+            existing.createdAt,
+            Instant.now(),
+            Optional.ofNullable(dueDate).orElse(existing.dueDate)
+    );
+}
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
