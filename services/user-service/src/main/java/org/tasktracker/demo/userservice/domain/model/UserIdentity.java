@@ -39,27 +39,6 @@ public record UserIdentity(
         return Collections.unmodifiableSet(grantedAuthorities);
     }
 
-    //    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-//
-//        if (roles != null && !roles.isEmpty()) {
-//            String[] roleArray = roles.split(",");
-//            for (String role : roleArray) {
-//                role = role.trim();
-//                if (!role.isEmpty()) {
-//                    grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-//                }
-//            }
-//        }
-//
-//        grantedAuthorities.addAll(authorities.stream()
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toUnmodifiableSet()));
-//
-//        return grantedAuthorities;
-//    }
-
     @Override
     public String getPassword() {
         return password;
