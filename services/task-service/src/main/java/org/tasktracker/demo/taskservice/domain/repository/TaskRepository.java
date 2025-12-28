@@ -13,8 +13,9 @@ import java.util.UUID;
  */
 public interface TaskRepository {
     Mono<Task> save(Task task);
+    Mono<Task> updateTask(UUID id, Task task);
+    Flux<Task> findAllTasks();
     Mono<Task> findTaskById(UUID taskId);
     Mono<Task> findTaskByTitle(String title);
-    Flux<Task> findAllTasks();
     Mono<Task> findTaskByAssigneeId(UUID assigneeId);
 }

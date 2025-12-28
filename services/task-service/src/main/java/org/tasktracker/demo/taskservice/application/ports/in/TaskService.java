@@ -16,9 +16,9 @@ import java.util.UUID;
  */
 public interface TaskService {
     Mono<Task> createTask(TaskRequest request);
+    Mono<Task> updateTask(UUID id, TaskUpdateRequest request);
     Flux<Task> listUsersTasks(TaskFilter filter);
     Mono<Task> findTaskById(UUID id);
-    Mono<Task> updateTask(UUID id, TaskUpdateRequest request);
     Mono<Task> changeStatus(UUID id, String status);
     Mono<Void> deleteTask(UUID id);
 }

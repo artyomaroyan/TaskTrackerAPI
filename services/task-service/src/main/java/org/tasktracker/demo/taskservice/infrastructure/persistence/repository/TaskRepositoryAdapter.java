@@ -41,6 +41,21 @@ public class TaskRepositoryAdapter implements TaskRepository {
     }
 
     @Override
+    public Mono<Task> updateTask(UUID id, Task task) {
+        return null;
+    }
+
+    @Override
+    public Flux<Task> findAllTasks() {
+        return reactiveRepository.findAll()
+                .sort(Comparator.comparing(TaskEntity::getCreatedAt))
+                .flatMap(taskMapper::toDomain)
+                .doOnComplete(() -> log.debug("Tasks fetch successfully."))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataReadingException("Unable to load all tasks", ex.getCause()));
+    }
+
+    @Override
     public Mono<Task> findTaskById(UUID taskId) {
         log.debug("Finding task with ID {}", taskId);
         return reactiveRepository.findById(taskId)
@@ -57,16 +72,6 @@ public class TaskRepositoryAdapter implements TaskRepository {
                 .doOnSuccess(_ -> log.debug("Found task by title: {}", title))
                 .onErrorMap(DataAccessException.class, ex ->
                         new DataReadingException("Failed to found task with title: " + title, ex));
-    }
-
-    @Override
-    public Flux<Task> findAllTasks() {
-        return reactiveRepository.findAll()
-                .sort(Comparator.comparing(TaskEntity::getCreatedAt))
-                .flatMap(taskMapper::toDomain)
-                .doOnComplete(() -> log.debug("Tasks fetch successfully."))
-                .onErrorMap(DataAccessException.class, ex ->
-                         new DataReadingException("Unable to load all tasks", ex.getCause()));
     }
 
     @Override
