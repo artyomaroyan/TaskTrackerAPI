@@ -1,9 +1,8 @@
 package org.tasktracker.demo.taskservice.domain.model;
 
-import jakarta.annotation.Nullable;
-
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -32,22 +31,18 @@ public record Task(UUID id, UUID assigneeId, String title, String description, S
         return new Task(null, assigneeId, title, description, status, priority, Instant.now(), Instant.now(), dueDate);
     }
 
-    public Task updateTask(@Nullable UUID assigneeId,
-                           @Nullable String title,
-                           @Nullable String description,
-                           @Nullable Status status,
-                           @Nullable Priority priority,
-                           @Nullable Instant dueDate) {
+    public static Task updateTask(Task existing, UUID assigneeId, String title, String description, Status status, Priority priority, Instant dueDate) {
         return new Task(
-                this.id,
-                assigneeId != null ? assigneeId : this.assigneeId,
-                title != null ? title : this.title,
-                description != null ? description : this.description,
-                status != null ? status : this.status,
-                priority != null ? priority : this.priority,
-                this.createdAt,
+                existing.id,
+                Optional.ofNullable(assigneeId).orElse(existing.assigneeId),
+                Optional.ofNullable(title).orElse(existing.title),
+                Optional.ofNullable(description).orElse(existing.description),
+                Optional.ofNullable(status).orElse(existing.status),
+                Optional.ofNullable(priority).orElse(existing.priority),
+                existing.createdAt,
                 Instant.now(),
-                dueDate != null ? dueDate : this.dueDate);
+                Optional.ofNullable(dueDate).orElse(existing.dueDate)
+        );
     }
 
     public static Task changeStatus(Task existing, Status newStatus) {
