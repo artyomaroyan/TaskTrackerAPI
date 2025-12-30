@@ -52,6 +52,16 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public Mono<Task> findTaskByAssigneeId(UUID assigneeId) {
+        return null;
+    }
+
+    @Override
+    public Mono<Task> findTaskByTitle(String title) {
+        return null;
+    }
+
+    @Override
     @Transactional
     public Mono<Task> changeStatus(UUID id, String status) {
         return null;

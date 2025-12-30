@@ -66,6 +66,15 @@ public class TaskRepositoryAdapter implements TaskRepository {
     }
 
     @Override
+    public Mono<Task> findTaskByAssigneeId(UUID assigneeId) {
+        return reactiveRepository.findByAssigneeId(assigneeId)
+                .flatMap(taskMapper::toDomain)
+                .doOnSuccess(_ -> log.debug("Found task by assignee ID: {}", assigneeId))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataReadingException("failed to found task with assignee ID: " + assigneeId, ex));
+    }
+
+    @Override
     public Mono<Task> findTaskByTitle(String title) {
         return reactiveRepository.findByTitle(title)
                 .flatMap(taskMapper::toDomain)
@@ -75,11 +84,12 @@ public class TaskRepositoryAdapter implements TaskRepository {
     }
 
     @Override
-    public Mono<Task> findTaskByAssigneeId(UUID assigneeId) {
-        return reactiveRepository.findByAssigneeId(assigneeId)
-                .flatMap(taskMapper::toDomain)
-                .doOnSuccess(_ -> log.debug("Found task by assignee ID: {}", assigneeId))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataReadingException("failed to found task with assignee ID: " + assigneeId, ex));
+    public Mono<Task> changeStatus(UUID id, String status) {
+        return null;
+    }
+
+    @Override
+    public Mono<Void> deleteTask(UUID id) {
+        return null;
     }
 }

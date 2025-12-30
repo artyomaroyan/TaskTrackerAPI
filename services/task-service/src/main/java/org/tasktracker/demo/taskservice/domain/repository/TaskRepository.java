@@ -16,6 +16,8 @@ public interface TaskRepository {
     Mono<Task> updateTask(UUID id, Task task);
     Flux<Task> findAllTasks();
     Mono<Task> findTaskById(UUID taskId);
-    Mono<Task> findTaskByTitle(String title);
     Mono<Task> findTaskByAssigneeId(UUID assigneeId);
+    Mono<Task> findTaskByTitle(String title);
+    Mono<Task> changeStatus(UUID id, String status);
+    Mono<Void> deleteTask(UUID id);
 }
