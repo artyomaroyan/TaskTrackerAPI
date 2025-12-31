@@ -42,7 +42,14 @@ public class TaskRepositoryAdapter implements TaskRepository {
 
     @Override
     public Mono<Task> updateTask(UUID id, Task task) {
-        return null;
+        log.debug("Updating task - ID: {}", id);
+        return Mono.just(task)
+                .flatMap(taskMapper::toEntity)
+                .flatMap(reactiveRepository::updateTask)
+                .flatMap(taskMapper::toDomain)
+                .doOnSuccess(_ -> log.info("Task - {} was successfully updated", id))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataSavingException("Failed to update task", ex.getCause()));
     }
 
     @Override
