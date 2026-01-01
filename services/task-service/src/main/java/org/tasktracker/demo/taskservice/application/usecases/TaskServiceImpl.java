@@ -97,8 +97,7 @@ public class TaskServiceImpl implements TaskService {
         try {
             return this.findTaskById(id)
                     .flatMap(currentTask -> {
-                        Task updated = Task.updateTask(
-                                currentTask,
+                        currentTask.updateTask(
                                 UUID.randomUUID(),
                                 request.title(),
                                 request.description(),
@@ -106,7 +105,7 @@ public class TaskServiceImpl implements TaskService {
                                 request.priority(),
                                 request.dueDate()
                         );
-                        return taskRepository.updateTask(id, updated);
+                        return taskRepository.updateTask(id, request);
                     });
         } catch (DataSavingException ex) {
             log.debug("unable to update task. {}, {}", request.title(), ex.getMessage());
