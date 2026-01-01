@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
+import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.application.mapper.TaskMapper;
+import org.tasktracker.demo.taskservice.domain.exception.DataNotFoundException;
 import org.tasktracker.demo.taskservice.domain.exception.DataReadingException;
 import org.tasktracker.demo.taskservice.domain.exception.DataSavingException;
+import org.tasktracker.demo.taskservice.domain.model.Status;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.domain.repository.TaskRepository;
 import org.tasktracker.demo.taskservice.infrastructure.persistence.entity.TaskEntity;
@@ -41,12 +44,13 @@ public class TaskRepositoryAdapter implements TaskRepository {
     }
 
     @Override
-    public Mono<Task> updateTask(UUID id, Task task) {
+    public Mono<Task> updateTask(UUID id, TaskUpdateRequest request) {
         log.debug("Updating task - ID: {}", id);
-        return Mono.just(task)
-                .flatMap(taskMapper::toEntity)
-                .flatMap(reactiveRepository::updateTask)
+        return reactiveRepository.findById(id)
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found!")))
                 .flatMap(taskMapper::toDomain)
+                .map(existing -> applyUpdates(existing, request))
+                .flatMap(this::saveUpdates)
                 .doOnSuccess(_ -> log.info("Task - {} was successfully updated", id))
                 .onErrorMap(DataAccessException.class, ex ->
                         new DataSavingException("Failed to update task", ex.getCause()));
@@ -92,11 +96,44 @@ public class TaskRepositoryAdapter implements TaskRepository {
 
     @Override
     public Mono<Task> changeStatus(UUID id, String status) {
-        return null;
+        Status newStatus;
+        try {
+            newStatus = Status.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return Mono.error(new IllegalArgumentException("Invalid status value." + status));
+        }
+
+        return reactiveRepository.findById(id)
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found!")))
+                .flatMap(taskMapper::toDomain)
+                .map(task -> task.changeStatus(newStatus))
+                .flatMap(this::saveUpdates)
+                .doOnSuccess(_ -> log.debug("Task - {} status was changed to {}", id, newStatus))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataSavingException("Failed to update task status.", ex.getCause()));
+
     }
 
     @Override
     public Mono<Void> deleteTask(UUID id) {
         return null;
+    }
+
+    private Task applyUpdates(Task existing, TaskUpdateRequest request) {
+        return existing.updateTask(
+                request.assigneeId(),
+                request.title(),
+                request.description(),
+                request.status(),
+                request.priority(),
+                request.dueDate()
+        );
+    }
+
+    private Mono<Task> saveUpdates(Task task) {
+        return Mono.just(task)
+                .flatMap(taskMapper::toEntity)
+                .flatMap(reactiveRepository::save)
+                .flatMap(taskMapper::toDomain);
     }
 }
