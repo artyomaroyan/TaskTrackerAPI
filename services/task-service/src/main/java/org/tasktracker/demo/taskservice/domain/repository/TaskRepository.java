@@ -1,5 +1,6 @@
 package org.tasktracker.demo.taskservice.domain.repository;
 
+import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,7 +14,7 @@ import java.util.UUID;
  */
 public interface TaskRepository {
     Mono<Task> save(Task task);
-    Mono<Task> updateTask(UUID id, Task task);
+    Mono<Task> updateTask(UUID id, TaskUpdateRequest request);
     Flux<Task> findAllTasks();
     Mono<Task> findTaskById(UUID taskId);
     Mono<Task> findTaskByAssigneeId(UUID assigneeId);

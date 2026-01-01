@@ -1,5 +1,7 @@
 package org.tasktracker.demo.taskservice.domain.model;
 
+import jakarta.annotation.Nullable;
+
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,23 +33,24 @@ public record Task(UUID id, UUID assigneeId, String title, String description, S
         return new Task(null, assigneeId, title, description, status, priority, Instant.now(), Instant.now(), dueDate);
     }
 
-    public static Task updateTask(Task existing, UUID assigneeId, String title, String description, Status status, Priority priority, Instant dueDate) {
+    public Task updateTask(@Nullable UUID assigneeId, @Nullable String title, @Nullable String description,
+                           @Nullable Status status, @Nullable Priority priority, @Nullable Instant dueDate) {
         return new Task(
-                existing.id,
-                Optional.ofNullable(assigneeId).orElse(existing.assigneeId),
-                Optional.ofNullable(title).orElse(existing.title),
-                Optional.ofNullable(description).orElse(existing.description),
-                Optional.ofNullable(status).orElse(existing.status),
-                Optional.ofNullable(priority).orElse(existing.priority),
-                existing.createdAt,
+                this.id,
+                Optional.ofNullable(assigneeId).orElse(this.assigneeId),
+                Optional.ofNullable(title).orElse(this.title),
+                Optional.ofNullable(description).orElse(this.description),
+                Optional.ofNullable(status).orElse(this.status),
+                Optional.ofNullable(priority).orElse(this.priority),
+                this.createdAt,
                 Instant.now(),
-                Optional.ofNullable(dueDate).orElse(existing.dueDate)
+                Optional.ofNullable(dueDate).orElse(this.dueDate)
         );
     }
 
-    public static Task changeStatus(Task existing, Status newStatus) {
-        return new Task(existing.id, existing.assigneeId, existing.title, existing.description,
-                newStatus, existing.priority, existing.createdAt, Instant.now(), existing.dueDate);
+    public Task changeStatus(Status newStatus) {
+        return new Task(this.id, this.assigneeId, this.title, this.description,
+                newStatus, this.priority, this.createdAt, Instant.now(), this.dueDate);
     }
 
     public static Task of(UUID id, UUID assigneeId, String title, String description, Status status,
