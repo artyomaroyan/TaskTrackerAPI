@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
+import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.application.mapper.TaskMapper;
 import org.tasktracker.demo.taskservice.domain.exception.DataNotFoundException;
 import org.tasktracker.demo.taskservice.domain.exception.DataReadingException;
 import org.tasktracker.demo.taskservice.domain.exception.DataSavingException;
+import org.tasktracker.demo.taskservice.domain.exception.DataTransactionException;
 import org.tasktracker.demo.taskservice.domain.model.Status;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.domain.repository.TaskRepository;
@@ -35,9 +37,7 @@ public class TaskRepositoryAdapter implements TaskRepository {
     public Mono<Task> save(Task task) {
         log.debug("Creating task with ID: {}", task.id());
         return Mono.just(task)
-                .flatMap(taskMapper::toEntity)
-                .flatMap(reactiveRepository::save)
-                .flatMap(taskMapper::toDomain)
+                .flatMap(this::saveUpdates)
                 .doOnSuccess(saved -> log.debug("Task {} was successfully saved.", saved.id()))
                 .onErrorMap(DataAccessException.class, ex ->
                         new DataSavingException("Failed to create task with id: " + task.id(), ex));
@@ -53,11 +53,11 @@ public class TaskRepositoryAdapter implements TaskRepository {
                 .flatMap(this::saveUpdates)
                 .doOnSuccess(_ -> log.info("Task - {} was successfully updated", id))
                 .onErrorMap(DataAccessException.class, ex ->
-                        new DataSavingException("Failed to update task", ex.getCause()));
+                        new DataTransactionException("Failed to update task", ex.getCause()));
     }
 
     @Override
-    public Flux<Task> findAllTasks() {
+    public Flux<Task> findAllTasks(TaskFilter filter) {
         return reactiveRepository.findAll()
                 .sort(Comparator.comparing(TaskEntity::getCreatedAt))
                 .flatMap(taskMapper::toDomain)
@@ -77,7 +77,7 @@ public class TaskRepositoryAdapter implements TaskRepository {
     }
 
     @Override
-    public Mono<Task> findTaskByAssigneeId(UUID assigneeId) {
+    public Flux<Task> findTaskByAssigneeId(UUID assigneeId) {
         return reactiveRepository.findByAssigneeId(assigneeId)
                 .flatMap(taskMapper::toDomain)
                 .doOnSuccess(_ -> log.debug("Found task by assignee ID: {}", assigneeId))
@@ -87,6 +87,7 @@ public class TaskRepositoryAdapter implements TaskRepository {
 
     @Override
     public Mono<Task> findTaskByTitle(String title) {
+        log.debug("Finding task with title {}", title);
         return reactiveRepository.findByTitle(title)
                 .flatMap(taskMapper::toDomain)
                 .doOnSuccess(_ -> log.debug("Found task by title: {}", title))
@@ -110,13 +111,17 @@ public class TaskRepositoryAdapter implements TaskRepository {
                 .flatMap(this::saveUpdates)
                 .doOnSuccess(_ -> log.debug("Task - {} status was changed to {}", id, newStatus))
                 .onErrorMap(DataAccessException.class, ex ->
-                        new DataSavingException("Failed to update task status.", ex.getCause()));
+                        new DataTransactionException("Failed to update task status.", ex.getCause()));
 
     }
 
     @Override
     public Mono<Void> deleteTask(UUID id) {
-        return null;
+        log.debug("Deleting task - ID: {}", id);
+        return reactiveRepository.deleteById(id)
+                .doOnSuccess(_ -> log.debug("Task - {} successfully deleted.", id))
+                .onErrorMap(DataAccessException.class, ex ->
+                        new DataTransactionException("Failed to delete task", ex.getCause()));
     }
 
     private Task applyUpdates(Task existing, TaskUpdateRequest request) {

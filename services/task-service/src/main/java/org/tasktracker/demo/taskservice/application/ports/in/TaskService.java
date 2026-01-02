@@ -19,7 +19,7 @@ public interface TaskService {
     Mono<Task> updateTask(UUID id, TaskUpdateRequest request);
     Flux<Task> listUsersTasks(TaskFilter filter);
     Mono<Task> findTaskById(UUID id);
-    Mono<Task> findTaskByAssigneeId(UUID assigneeId);
+    Flux<Task> findTaskByAssigneeId(UUID assigneeId);
     Mono<Task> findTaskByTitle(String title);
     Mono<Task> changeStatus(UUID id, String status);
     Mono<Void> deleteTask(UUID id);

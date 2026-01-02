@@ -43,7 +43,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Flux<Task> listUsersTasks(TaskFilter filter) {
-        return taskRepository.findAllTasks();
+        return taskRepository.findAllTasks(filter);
     }
 
     @Override
@@ -52,25 +52,25 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<Task> findTaskByAssigneeId(UUID assigneeId) {
-        return null;
+    public Flux<Task> findTaskByAssigneeId(UUID assigneeId) {
+        return taskRepository.findTaskByAssigneeId(assigneeId);
     }
 
     @Override
     public Mono<Task> findTaskByTitle(String title) {
-        return null;
+        return taskRepository.findTaskByTitle(title);
     }
 
     @Override
     @Transactional
     public Mono<Task> changeStatus(UUID id, String status) {
-        return null;
+        return taskRepository.changeStatus(id, status);
     }
 
     @Override
     @Transactional
     public Mono<Void> deleteTask(UUID id) {
-        return null;
+        return taskRepository.deleteTask(id);
     }
 
     private Mono<Task> saveTask(TaskRequest request) {
