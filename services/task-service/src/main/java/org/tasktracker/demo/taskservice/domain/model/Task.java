@@ -1,7 +1,5 @@
 package org.tasktracker.demo.taskservice.domain.model;
 
-import jakarta.annotation.Nullable;
-
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,8 +31,7 @@ public record Task(UUID id, UUID assigneeId, String title, String description, S
         return new Task(null, assigneeId, title, description, status, priority, Instant.now(), Instant.now(), dueDate);
     }
 
-    public Task updateTask(@Nullable UUID assigneeId, @Nullable String title, @Nullable String description,
-                           @Nullable Status status, @Nullable Priority priority, @Nullable Instant dueDate) {
+    public Task updateTask(UUID assigneeId, String title, String description, Status status, Priority priority, Instant dueDate) {
         return new Task(
                 this.id,
                 Optional.ofNullable(assigneeId).orElse(this.assigneeId),
