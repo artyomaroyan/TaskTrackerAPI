@@ -17,10 +17,10 @@ import java.util.UUID;
 public interface TaskService {
     Mono<Task> createTask(TaskRequest request);
     Mono<Task> updateTask(UUID id, TaskUpdateRequest request);
+    Mono<Task> changeStatus(UUID id, String status);
     Flux<Task> listUsersTasks(TaskFilter filter);
     Mono<Task> findTaskById(UUID id);
     Flux<Task> findTaskByAssigneeId(UUID assigneeId);
     Mono<Task> findTaskByTitle(String title);
-    Mono<Task> changeStatus(UUID id, String status);
     Mono<Void> deleteTask(UUID id);
 }
