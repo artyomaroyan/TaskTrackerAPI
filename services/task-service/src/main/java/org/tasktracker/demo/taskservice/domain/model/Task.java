@@ -27,17 +27,17 @@ public record Task(UUID id, UUID assigneeId, String title, String description, S
 
     }
 
-    public static Task create(UUID assigneeId, String title, String description, Status status, Priority priority, Instant dueDate) {
-        return new Task(null, assigneeId, title, description, status, priority, Instant.now(), Instant.now(), dueDate);
+    public static Task create(UUID assigneeId, String title, String description, Priority priority, Instant dueDate) {
+        return new Task(null, assigneeId, title, description, Status.NEW, priority, Instant.now(), Instant.now(), dueDate);
     }
 
-    public Task updateTask(UUID assigneeId, String title, String description, Status status, Priority priority, Instant dueDate) {
+    public Task updateTask(String title, String description, Priority priority, Instant dueDate) {
         return new Task(
                 this.id,
-                Optional.ofNullable(assigneeId).orElse(this.assigneeId),
+                this.assigneeId,
                 Optional.ofNullable(title).orElse(this.title),
                 Optional.ofNullable(description).orElse(this.description),
-                Optional.ofNullable(status).orElse(this.status),
+                this.status,
                 Optional.ofNullable(priority).orElse(this.priority),
                 this.createdAt,
                 Instant.now(),

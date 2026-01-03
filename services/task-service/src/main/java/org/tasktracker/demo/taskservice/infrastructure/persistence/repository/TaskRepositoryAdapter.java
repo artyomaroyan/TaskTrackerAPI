@@ -3,22 +3,16 @@ package org.tasktracker.demo.taskservice.infrastructure.persistence.repository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
-import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.application.mapper.TaskMapper;
 import org.tasktracker.demo.taskservice.domain.exception.DataNotFoundException;
-import org.tasktracker.demo.taskservice.domain.exception.DataReadingException;
 import org.tasktracker.demo.taskservice.domain.exception.DataSavingException;
-import org.tasktracker.demo.taskservice.domain.exception.DataTransactionException;
-import org.tasktracker.demo.taskservice.domain.model.Status;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.domain.repository.TaskRepository;
-import org.tasktracker.demo.taskservice.infrastructure.persistence.entity.TaskEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Comparator;
 import java.util.UUID;
 
 /**
@@ -27,7 +21,7 @@ import java.util.UUID;
  * Time: 21:54:03
  */
 @Slf4j
-@Component
+@Repository
 @RequiredArgsConstructor
 public class TaskRepositoryAdapter implements TaskRepository {
     private final TaskMapper taskMapper;
@@ -35,110 +29,28 @@ public class TaskRepositoryAdapter implements TaskRepository {
 
     @Override
     public Mono<Task> save(Task task) {
-        log.debug("Creating task with ID: {}", task.id());
-        return Mono.just(task)
-                .flatMap(this::saveUpdates)
-                .doOnSuccess(saved -> log.debug("Task {} was successfully saved.", saved.id()))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataSavingException("Failed to create task with id: " + task.id(), ex));
-    }
-
-    @Override
-    public Mono<Task> updateTask(UUID id, TaskUpdateRequest request) {
-        log.debug("Updating task - ID: {}", id);
-        return reactiveRepository.findById(id)
-                .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found!")))
+        return taskMapper.toEntity(task)
+                .flatMap(reactiveRepository::save)
                 .flatMap(taskMapper::toDomain)
-                .map(existing -> applyUpdates(existing, request))
-                .flatMap(this::saveUpdates)
-                .doOnSuccess(_ -> log.info("Task - {} was successfully updated", id))
                 .onErrorMap(DataAccessException.class, ex ->
-                        new DataTransactionException("Failed to update task", ex.getCause()));
+                        new DataSavingException("Failed to save task", ex.getCause()));
     }
 
     @Override
     public Flux<Task> findAllTasks(TaskFilter filter) {
         return reactiveRepository.findAll()
-                .sort(Comparator.comparing(TaskEntity::getCreatedAt))
-                .flatMap(taskMapper::toDomain)
-                .doOnComplete(() -> log.debug("Tasks fetch successfully."))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataReadingException("Unable to load all tasks", ex.getCause()));
+                .flatMap(taskMapper::toDomain);
     }
 
     @Override
     public Mono<Task> findTaskById(UUID taskId) {
-        log.debug("Finding task with ID {}", taskId);
         return reactiveRepository.findById(taskId)
-                .flatMap(taskMapper::toDomain)
-                .doOnSuccess(_ -> log.debug("Found task with ID: {}", taskId))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataReadingException("Failed to find task with ID: " + taskId, ex));
-    }
-
-    @Override
-    public Flux<Task> findTaskByAssigneeId(UUID assigneeId) {
-        return reactiveRepository.findByAssigneeId(assigneeId)
-                .flatMap(taskMapper::toDomain)
-                .doOnSuccess(_ -> log.debug("Found task by assignee ID: {}", assigneeId))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataReadingException("failed to found task with assignee ID: " + assigneeId, ex));
-    }
-
-    @Override
-    public Mono<Task> findTaskByTitle(String title) {
-        log.debug("Finding task with title {}", title);
-        return reactiveRepository.findByTitle(title)
-                .flatMap(taskMapper::toDomain)
-                .doOnSuccess(_ -> log.debug("Found task by title: {}", title))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataReadingException("Failed to found task with title: " + title, ex));
-    }
-
-    @Override
-    public Mono<Task> changeStatus(UUID id, String status) {
-        Status newStatus;
-        try {
-            newStatus = Status.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            return Mono.error(new IllegalArgumentException("Invalid status value." + status));
-        }
-
-        return reactiveRepository.findById(id)
-                .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found!")))
-                .flatMap(taskMapper::toDomain)
-                .map(task -> task.changeStatus(newStatus))
-                .flatMap(this::saveUpdates)
-                .doOnSuccess(_ -> log.debug("Task - {} status was changed to {}", id, newStatus))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataTransactionException("Failed to update task status.", ex.getCause()));
-
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found")))
+                .flatMap(taskMapper::toDomain);
     }
 
     @Override
     public Mono<Void> deleteTask(UUID id) {
-        log.debug("Deleting task - ID: {}", id);
-        return reactiveRepository.deleteById(id)
-                .doOnSuccess(_ -> log.debug("Task - {} successfully deleted.", id))
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataTransactionException("Failed to delete task", ex.getCause()));
-    }
-
-    private Task applyUpdates(Task existing, TaskUpdateRequest request) {
-        return existing.updateTask(
-                request.assigneeId(),
-                request.title(),
-                request.description(),
-                request.status(),
-                request.priority(),
-                request.dueDate()
-        );
-    }
-
-    private Mono<Task> saveUpdates(Task task) {
-        return Mono.just(task)
-                .flatMap(taskMapper::toEntity)
-                .flatMap(reactiveRepository::save)
-                .flatMap(taskMapper::toDomain);
+        return reactiveRepository.deleteById(id);
     }
 }

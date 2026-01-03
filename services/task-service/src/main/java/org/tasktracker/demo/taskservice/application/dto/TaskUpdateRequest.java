@@ -13,10 +13,8 @@ import java.util.UUID;
  * Time: 02:58:22
  */
 public record TaskUpdateRequest(
-        @Nullable UUID assigneeId,
         @Nullable String title,
         @Nullable String description,
-        @Nullable Status status,
         @Nullable Priority priority,
         @Nullable Instant dueDate) {
 }

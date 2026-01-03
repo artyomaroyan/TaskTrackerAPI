@@ -8,7 +8,9 @@ import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.dto.TaskRequest;
 import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.application.ports.in.TaskService;
+import org.tasktracker.demo.taskservice.domain.exception.DataNotFoundException;
 import org.tasktracker.demo.taskservice.domain.exception.DataSavingException;
+import org.tasktracker.demo.taskservice.domain.exception.DataTransactionException;
 import org.tasktracker.demo.taskservice.domain.model.Status;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.domain.repository.TaskRepository;
@@ -32,84 +34,72 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     public Mono<Task> createTask(TaskRequest request) {
-        return this.saveTask(request);
+        return SecurityContextService.currentUserId()
+                .map(userId -> Task.create(
+                        userId,
+                        request.title(),
+                        request.description(),
+                        request.priority(),
+                        request.dueDate()
+                ))
+                .flatMap(taskRepository::save)
+                .doOnSuccess(_ -> log.debug("Task successfully created."))
+                .onErrorMap(DataSavingException.class, ex ->
+                        new DataTransactionException("Failed to save task", ex));
     }
 
     @Override
     @Transactional
     public Mono<Task> updateTask(UUID id, TaskUpdateRequest request) {
-        return this.update(id, request);
-    }
-
-    @Override
-    public Flux<Task> listUsersTasks(TaskFilter filter) {
-        return taskRepository.findAllTasks(filter);
-    }
-
-    @Override
-    public Mono<Task> findTaskById(UUID id) {
-        return taskRepository.findTaskById(id);
-    }
-
-    @Override
-    public Flux<Task> findTaskByAssigneeId(UUID assigneeId) {
-        return taskRepository.findTaskByAssigneeId(assigneeId);
-    }
-
-    @Override
-    public Mono<Task> findTaskByTitle(String title) {
-        return taskRepository.findTaskByTitle(title);
+        return taskRepository.findTaskById(id)
+                .map(task -> task.updateTask(
+                        request.title(),
+                        request.description(),
+                        request.priority(),
+                        request.dueDate()
+                ))
+                .doOnSuccess(_ -> log.debug("Task successfully updated."))
+                .onErrorMap(DataTransactionException.class, ex ->
+                        new DataTransactionException("Failed to update task.", ex));
     }
 
     @Override
     @Transactional
     public Mono<Task> changeStatus(UUID id, String status) {
-        return taskRepository.changeStatus(id, status);
+        Status newStatus = Status.valueOf(status);
+        return taskRepository.findTaskById(id)
+                .map(task -> task.changeStatus(newStatus))
+                .flatMap(taskRepository::save)
+                .doOnSuccess(_ -> log.debug("Task status successfully changed."))
+                .onErrorMap(DataTransactionException.class, ex ->
+                        new DataTransactionException("Failed to change task status", ex));
+    }
+
+    @Override
+    public Flux<Task> listUsersTasks(TaskFilter filter) {
+        return taskRepository.findAllTasks(filter)
+                .switchIfEmpty(Mono.error(new DataNotFoundException("No task was founded.")));
+    }
+
+    @Override
+    public Mono<Task> findTaskById(UUID id) {
+        return taskRepository.findTaskById(id)
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found with id " + id)));
+    }
+
+    @Override
+    public Flux<Task> findTaskByAssigneeId(UUID assigneeId) {
+        return null;
+    }
+
+    @Override
+    public Mono<Task> findTaskByTitle(String title) {
+        return null;
     }
 
     @Override
     @Transactional
     public Mono<Void> deleteTask(UUID id) {
-        return taskRepository.deleteTask(id);
-    }
-
-    private Mono<Task> saveTask(TaskRequest request) {
-        try {
-            return SecurityContextService.currentUserId()
-                    .flatMap(assigneeId -> {
-                        Task newTask = Task.create(
-                                assigneeId,
-                                request.title(),
-                                request.description(),
-                                Status.NEW,
-                                request.priority(),
-                                request.dueDate()
-                        );
-                        return taskRepository.save(newTask);
-                    });
-        } catch (DataSavingException ex) {
-            log.debug("Failed to save task. {}, {}", request.title(), ex.getMessage());
-            throw new DataSavingException("unable to save task.", ex.getCause());
-        }
-    }
-
-    private Mono<Task> update(UUID id, TaskUpdateRequest request) {
-        try {
-            return this.findTaskById(id)
-                    .flatMap(currentTask -> {
-                        currentTask.updateTask(
-                                UUID.randomUUID(),
-                                request.title(),
-                                request.description(),
-                                Status.IN_PROGRESS,
-                                request.priority(),
-                                request.dueDate()
-                        );
-                        return taskRepository.updateTask(id, request);
-                    });
-        } catch (DataSavingException ex) {
-            log.debug("unable to update task. {}, {}", request.title(), ex.getMessage());
-            throw new DataSavingException("task updating exception", ex.getCause());
-        }
+        return null;
     }
 }
