@@ -17,7 +17,6 @@ import org.tasktracker.demo.userservice.application.ports.in.UserRegistrationSer
 import org.tasktracker.demo.userservice.application.ports.out.UserRepository;
 import org.tasktracker.demo.userservice.domain.exception.UserExistenceException;
 import org.tasktracker.demo.userservice.domain.model.Email;
-import org.tasktracker.demo.userservice.domain.model.Role;
 import org.tasktracker.demo.userservice.domain.model.User;
 import reactor.core.publisher.Mono;
 

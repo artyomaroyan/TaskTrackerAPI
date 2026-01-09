@@ -40,35 +40,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     }
                 });
     }
-
-//    @Override
-//    @PreAuthorize("permitAll()")
-//    public Mono<String> login(AuthenticationRequest request) {
-//        return userDetailsService.findByUsername(request.username())
-//                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found!")))
-//                .filter(user -> passwordEncoder.matches(request.password(), user.getPassword()))
-//                .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid credentials")))
-//                .map(user -> new UserIdentity(
-//                        user.getUsername(),
-//                        null,
-//                        extractRoles(user),
-//                        extractAuthorities(user),
-//                        user.isEnabled()
-//                ))
-//                .flatMap(tokenProvider::generateAccessToken);
-//    }
-//
-//    private Set<Role> extractRoles(final UserDetails userDetails) {
-//        return userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .filter(r -> r.startsWith("ROLE_"))
-//                .map(r -> r.substring(5))
-//                .collect(Collectors.toUnmodifiableSet());
-//    }
-//
-//    private Set<String> extractAuthorities (final UserDetails userDetails) {
-//        return userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toUnmodifiableSet());
-//    }
 }
