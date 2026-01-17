@@ -58,6 +58,7 @@ final class JwtTokenProvider implements TokenProvider {
                             .issuer(jwtProperties.issuer())
                             .issuedAt(now)
                             .expiration(exp)
+                            .claim("userId", user.userId())
                             .claim("roles", roleName)
                             .claim("authorities", user.authorities())
                             .signWith(keyProvider.getPrivateKey(), Jwts.SIG.RS256)

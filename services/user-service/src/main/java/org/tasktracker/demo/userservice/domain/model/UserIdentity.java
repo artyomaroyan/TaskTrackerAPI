@@ -12,13 +12,15 @@ import java.util.*;
  * Time: 20:30:11
  */
 public record UserIdentity(
+        UUID userId,
         String username,
         String password,
         Set<Role> roles,
         Set<String> authorities,
         boolean enabled) implements UserDetails {
 
-    public UserIdentity(String username, String password, Set<Role> roles, Set<String> authorities, boolean enabled) {
+    public UserIdentity(UUID userId, String username, String password, Set<Role> roles, Set<String> authorities, boolean enabled) {
+        this.userId = Objects.requireNonNull(userId);
         this.username = Objects.requireNonNull(username);
         this.password = password;
         this.roles = Objects.requireNonNull(roles);
@@ -50,6 +52,6 @@ public record UserIdentity(
     }
 
     public UserIdentity withoutPassword() {
-        return new UserIdentity(this.username, null, this.roles, this.authorities, this.enabled);
+        return new UserIdentity(this.userId, this.username, null, this.roles, this.authorities, this.enabled);
     }
 }
