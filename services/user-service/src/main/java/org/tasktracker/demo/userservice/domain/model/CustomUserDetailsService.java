@@ -37,6 +37,7 @@ public class CustomUserDetailsService implements ReactiveUserDetailsService {
         Set<String> authorities = user.getAuthorities();
 
         return new UserIdentity(
+                user.id(),
                 user.username(),
                 user.password(),
                 roles,
