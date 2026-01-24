@@ -21,6 +21,12 @@ spring:
     locations: classpath:db/migration
     driver-class-name: org.postgresql.Driver
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: /.well-known/jwks.json
+
 server:
   port: 8082
 
