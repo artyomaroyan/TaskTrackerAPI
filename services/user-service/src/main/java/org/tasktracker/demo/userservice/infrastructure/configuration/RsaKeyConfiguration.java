@@ -22,7 +22,7 @@ import java.util.UUID;
 public class RsaKeyConfiguration {
     private final KeyProvider keyProvider;
 
-    private RsaKeyConfiguration(KeyProvider keyProvider) {
+    protected RsaKeyConfiguration(KeyProvider keyProvider) {
         this.keyProvider = keyProvider;
     }
 

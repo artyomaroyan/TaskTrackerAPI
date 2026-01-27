@@ -1,3 +1,4 @@
+# user-service's application.yml
 spring:
   application:
     name: user-service
@@ -56,22 +57,22 @@ logging:
       tasktracker:
         demo:
           userservice:
-            application: trace
-            infrastructure: debug
-            security: trace
-            presentation: debug
+            application: info
+            infrastructure: info
+            security: info
+            presentation: info
       flywaydb: info
       springframework:
         security:
           web: info
-          core: trace
+          core: info
           access: info
-          authentication: trace
+          authentication: info
           authorization: info
-        _: trace
+        _: info
         web:
-          reactive: trace
-          _: trace
+          reactive: info
+          _: info
     reactor:
       Netty:
         http:
