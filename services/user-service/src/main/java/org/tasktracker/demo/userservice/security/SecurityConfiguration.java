@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.tasktracker.demo.userservice.application.ports.out.KeyProvider;
-import org.tasktracker.demo.userservice.infrastructure.configuration.PublicEndpoints;
+import org.tasktracker.demo.configuration.PublicEndpoints;
 import reactor.core.publisher.Mono;
 
 import java.security.interfaces.RSAPublicKey;
