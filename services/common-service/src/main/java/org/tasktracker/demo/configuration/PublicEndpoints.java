@@ -1,4 +1,4 @@
-package org.tasktracker.demo.userservice.infrastructure.configuration;
+package org.tasktracker.demo.configuration;
 
 import java.util.stream.Stream;
 
@@ -9,7 +9,7 @@ import java.util.stream.Stream;
  */
 public final class PublicEndpoints {
 
-    static final String[] SWAGGER = {
+    public static final String[] SWAGGER = {
             "/webjars/**", "/webjars/swagger-ui/**", "/v2/api-docs", "/v3/api-docs/", "/v3/api-docs/**",
             "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security"

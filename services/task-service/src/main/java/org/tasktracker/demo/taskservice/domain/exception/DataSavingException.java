@@ -6,6 +6,10 @@ package org.tasktracker.demo.taskservice.domain.exception;
  * Time: 00:18:23
  */
 public class DataSavingException extends RuntimeException {
+    public DataSavingException(String message) {
+        super(message);
+    }
+
     public DataSavingException(String message, Throwable cause) {
         super(message, cause);
     }

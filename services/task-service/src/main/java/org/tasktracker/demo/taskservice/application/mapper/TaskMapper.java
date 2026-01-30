@@ -5,6 +5,8 @@ import org.springframework.data.mapping.MappingException;
 import org.springframework.stereotype.Component;
 import org.tasktracker.demo.exception.DataMappingException;
 import org.tasktracker.demo.mapper.BaseMapper;
+import org.tasktracker.demo.taskservice.application.dto.TaskResponse;
+import org.tasktracker.demo.taskservice.domain.model.Priority;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.infrastructure.persistence.entity.TaskEntity;
 
@@ -17,6 +19,19 @@ import org.tasktracker.demo.taskservice.infrastructure.persistence.entity.TaskEn
 @Component
 public class TaskMapper extends BaseMapper<Task, TaskEntity> {
 
+    public TaskResponse toResponse(Task task) {
+        return new TaskResponse(
+                task.id(),
+                task.assigneeId(),
+                task.title(),
+                task.description(),
+                task.status().name(),
+                task.priority().name(),
+                task.createdAt(),
+                task.dueDate()
+        );
+    }
+
     @Override
     protected Task mapToDomain(TaskEntity entity) {
         try {
@@ -26,7 +41,7 @@ public class TaskMapper extends BaseMapper<Task, TaskEntity> {
                     entity.getTitle(),
                     entity.getDescription(),
                     entity.getStatus(),
-                    entity.getPriority(),
+                    Priority.valueOf(entity.getPriority()),
                     entity.getCreatedAt(),
                     entity.getUpdatedAt(),
                     entity.getDueDate());
@@ -44,7 +59,7 @@ public class TaskMapper extends BaseMapper<Task, TaskEntity> {
                 .title(domain.title())
                 .description(domain.description())
                 .status(domain.status())
-                .priority(domain.priority())
+                .priority(domain.priority().name())
                 .createdAt(domain.createdAt())
                 .updatedAt(domain.updatedAt())
                 .dueDate(domain.dueDate())
