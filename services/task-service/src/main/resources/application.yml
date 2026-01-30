@@ -1,3 +1,4 @@
+# task-service's application.yml
 spring:
   application:
     name: task-service
@@ -6,7 +7,7 @@ spring:
 
   r2dbc:
     url: r2dbc:postgresql://${DB_URL}:${DB_PORT}/${DB_NAME}
-    name: ${DB_USERNAME}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     properties:
       show-sql: true
@@ -30,11 +31,39 @@ spring:
 server:
   port: 8082
 
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui
-    operationsSorter: method
-    tagsSorter: alpha
-    display-request-duration: true
+logging:
+  level:
+    web: info
+    sql: info
+    org:
+      tasktracker:
+        demo:
+          taskservice:
+            application: info
+            infrastructure: info
+            security: info
+            presentation: info
+      flywaydb: info
+      springframework:
+        security:
+          web: info
+          core: info
+          access: info
+          authentication: info
+          authorization: info
+        _: info
+        web:
+          reactive: info
+          _: info
+    reactor:
+      Netty:
+        http:
+          client: info
+        data:
+          r2dbc:
+            core: info
+          _: info
+        r2dbc: info
+    io:
+      r2dbc:
+        PostgreSQL: info
