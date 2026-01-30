@@ -2,6 +2,7 @@ package org.tasktracker.demo.taskservice.application.ports.in;
 
 import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.dto.TaskRequest;
+import org.tasktracker.demo.taskservice.application.dto.TaskResponse;
 import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import reactor.core.publisher.Flux;
@@ -15,7 +16,7 @@ import java.util.UUID;
  * Time: 02:37:15
  */
 public interface TaskService {
-    Mono<Task> createTask(TaskRequest request);
+    Mono<TaskResponse> createTask(TaskRequest request, UUID userId);
     Mono<Task> updateTask(UUID id, TaskUpdateRequest request);
     Mono<Task> changeStatus(UUID id, String status);
     Flux<Task> listUsersTasks(TaskFilter filter);

@@ -9,6 +9,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.tasktracker.demo.configuration.PublicEndpoints;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -30,12 +31,14 @@ public class SecurityConfiguration {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(ServerHttpSecurity.CorsSpec::disable)
                 .authorizeExchange(exchange -> exchange
+                        .pathMatchers(PublicEndpoints.SWAGGER)
+                            .permitAll()
                         .pathMatchers("actuator")
-                        .permitAll()
+                            .permitAll()
                         .pathMatchers("auth")
-                        .hasAnyRole("ROLE_USER", "ROLE_ADMIN")
+                            .hasAnyRole("ROLE_USER", "ROLE_ADMIN")
                         .anyExchange()
-                        .authenticated()
+                            .authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->

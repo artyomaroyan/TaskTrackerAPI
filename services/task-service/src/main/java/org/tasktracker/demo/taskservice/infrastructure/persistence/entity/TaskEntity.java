@@ -3,7 +3,6 @@ package org.tasktracker.demo.taskservice.infrastructure.persistence.entity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-import org.tasktracker.demo.taskservice.domain.model.Priority;
 import org.tasktracker.demo.taskservice.domain.model.Status;
 
 import java.time.Instant;
@@ -28,7 +27,7 @@ public class TaskEntity {
     private String title;
     private String description;
     private Status status;
-    private Priority priority;
+    private String priority;
     private Instant createdAt;
     private Instant updatedAt;
     private Instant dueDate;
