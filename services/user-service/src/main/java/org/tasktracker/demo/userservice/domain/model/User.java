@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.tasktracker.demo.userservice.domain.model.Role.ADMIN;
+import static org.tasktracker.demo.userservice.domain.model.Role.USER;
 
 /**
  * Author: Artyom Aroyan
@@ -26,7 +26,7 @@ public record User(UUID id, String username, String password, Email email,
     }
 
     public static User create(String username, String password, Email email) {
-        return new User(null, username, password, email, ADMIN, Instant.now(), true);
+        return new User(null, username, password, email, USER, Instant.now(), true);
     }
 
     public static User of(UUID id, String username, String password, Email email, Role role, Instant createdAt, boolean active) {
