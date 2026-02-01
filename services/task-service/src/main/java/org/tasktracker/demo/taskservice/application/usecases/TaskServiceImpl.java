@@ -113,7 +113,7 @@ public class TaskServiceImpl implements TaskService {
     // todo: improve validation logic.
     private Mono<TaskRequest> validateTaskRequest(TaskRequest request) {
         // 1. validate title
-        Pattern pattern = Pattern.compile("^[A-Za-z\\s]+$");
+        Pattern pattern = Pattern.compile("^[A-Za-z0-9\\s]+$");
         if (!pattern.matcher(request.title()).matches()) {
             return Mono.error(() -> new TaskValidationException("Title is invalid"));
         }

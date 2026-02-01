@@ -53,6 +53,9 @@ final class JwtTokenProvider implements TokenProvider {
                             .collect(Collectors.toUnmodifiableSet());
 
                     return Jwts.builder()
+                            .header()
+                            .keyId("user-service-key")
+                            .and()
                             .id(UUID.randomUUID().toString())
                             .subject(user.getUsername())
                             .issuer(jwtProperties.issuer())
