@@ -23,7 +23,7 @@ import java.util.List;
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
 @EnableReactiveMethodSecurity
-public class SecurityConfiguration {
+class SecurityConfiguration {
 
     @Bean
     protected SecurityWebFilterChain filterChain(ServerHttpSecurity httpSecurity) {
