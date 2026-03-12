@@ -2,12 +2,10 @@ package org.tasktracker.demo.taskservice.infrastructure.persistence.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.mapper.TaskMapper;
 import org.tasktracker.demo.taskservice.domain.exception.DataNotFoundException;
-import org.tasktracker.demo.taskservice.domain.exception.DataSavingException;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import org.tasktracker.demo.taskservice.domain.repository.TaskRepository;
 import reactor.core.publisher.Flux;
@@ -31,9 +29,7 @@ public class TaskRepositoryAdapter implements TaskRepository {
     public Mono<Task> save(Task task) {
         return taskMapper.toEntity(task)
                 .flatMap(reactiveRepository::save)
-                .flatMap(taskMapper::toDomain)
-                .onErrorMap(DataAccessException.class, ex ->
-                        new DataSavingException("Failed to save task", ex.getCause()));
+                .flatMap(taskMapper::toDomain);
     }
 
     @Override

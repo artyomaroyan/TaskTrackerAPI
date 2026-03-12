@@ -51,7 +51,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('USER')")
-    public Mono<Task> updateTask(UUID id, TaskUpdateRequest request) {
+    public Mono<TaskResponse> updateTask(UUID id, TaskUpdateRequest request) {
         return taskRepository.findTaskById(id)
                 .map(task -> task.updateTask(
                         request.title(),
@@ -59,6 +59,7 @@ public class TaskServiceImpl implements TaskService {
                         request.priority(),
                         request.dueDate()
                 ))
+                .map(taskMapper::toResponse)
                 .doOnSuccess(_ -> log.debug("Task successfully updated."))
                 .onErrorMap(DataTransactionException.class, ex ->
                         new DataTransactionException("Failed to update task.", ex));
@@ -67,39 +68,42 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     @PreAuthorize("hasRole('USER')")
-    public Mono<Task> changeStatus(UUID id, String status) {
-        Status newStatus = Status.valueOf(status);
+    public Mono<TaskResponse> changeStatus(UUID id, Status status) {
         return taskRepository.findTaskById(id)
-                .map(task -> task.changeStatus(newStatus))
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found:" + id)))
+                .map(task -> task.changeStatus(status))
                 .flatMap(taskRepository::save)
-                .doOnSuccess(_ -> log.debug("Task status successfully changed."))
+                .map(taskMapper::toResponse)
+                .doOnSuccess(_ -> log.debug("Task {} status changed to {}", id, status))
                 .onErrorMap(DataTransactionException.class, ex ->
                         new DataTransactionException("Failed to change task status", ex));
     }
 
     @Override
     @PreAuthorize("hasRole('USER')") // also need to chack if the user who make the request is the logged-in user.
-    public Flux<Task> listUsersTasks(TaskFilter filter) {
+    public Flux<TaskResponse> listUsersTasks(TaskFilter filter) {
         return taskRepository.findAllTasks(filter)
+                .map(taskMapper::toResponse)
                 .switchIfEmpty(Mono.error(new DataNotFoundException("No task was founded.")));
     }
 
     @Override
     @PreAuthorize("hasRole('USER')") // also need to chack if the user who make the request is the logged-in user.
-    public Mono<Task> findTaskById(UUID id) {
+    public Mono<TaskResponse> findTaskById(UUID id) {
         return taskRepository.findTaskById(id)
+                .map(taskMapper::toResponse)
                 .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found with id " + id)));
     }
 
     @Override
     @PreAuthorize("hasRole('USER')") // also need to chack if the user who make the request is the logged-in user.
-    public Flux<Task> findTaskByAssigneeId(UUID assigneeId) {
+    public Flux<TaskResponse> findTaskByAssigneeId(UUID assigneeId) {
         return null;
     }
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Mono<Task> findTaskByTitle(String title) {
+    public Mono<TaskResponse> findTaskByTitle(String title) {
         return null;
     }
 
