@@ -4,7 +4,7 @@ import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.dto.TaskRequest;
 import org.tasktracker.demo.taskservice.application.dto.TaskResponse;
 import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
-import org.tasktracker.demo.taskservice.domain.model.Task;
+import org.tasktracker.demo.taskservice.domain.model.Status;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,11 +17,11 @@ import java.util.UUID;
  */
 public interface TaskService {
     Mono<TaskResponse> createTask(TaskRequest request, UUID userId);
-    Mono<Task> updateTask(UUID id, TaskUpdateRequest request);
-    Mono<Task> changeStatus(UUID id, String status);
-    Flux<Task> listUsersTasks(TaskFilter filter);
-    Mono<Task> findTaskById(UUID id);
-    Flux<Task> findTaskByAssigneeId(UUID assigneeId);
-    Mono<Task> findTaskByTitle(String title);
+    Mono<TaskResponse> updateTask(UUID id, TaskUpdateRequest request);
+    Mono<TaskResponse> changeStatus(UUID id, Status status);
+    Flux<TaskResponse> listUsersTasks(TaskFilter filter);
+    Mono<TaskResponse> findTaskById(UUID id);
+    Flux<TaskResponse> findTaskByAssigneeId(UUID assigneeId);
+    Mono<TaskResponse> findTaskByTitle(String title);
     Mono<Void> deleteTask(UUID id);
 }
