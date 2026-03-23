@@ -11,7 +11,9 @@ import org.tasktracker.demo.taskservice.application.dto.TaskRequest;
 import org.tasktracker.demo.taskservice.application.dto.TaskResponse;
 import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.application.ports.in.TaskService;
+import org.tasktracker.demo.taskservice.domain.exception.TaskValidationException;
 import org.tasktracker.demo.taskservice.domain.model.Status;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -29,29 +31,43 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping("/auth/create")
-    ResponseEntity<Mono<TaskResponse>> createTask(@Valid @RequestBody TaskRequest request, Authentication authentication) {
-//        Jwt jwt = (Jwt) authentication.getPrincipal();
-//        UUID userId = UUID.fromString(jwt.getClaimAsString("userId"));
+    Mono<ResponseEntity<TaskResponse>> createTask(@Valid @RequestBody TaskRequest request, Authentication authentication) {
         UUID userId = extractUserId(authentication);
-        var response = taskService.createTask(request, userId);
-        return ResponseEntity.ok(response);
+        return taskService.createTask(request, userId)
+                .map(ResponseEntity::ok)
+                .onErrorResume(TaskValidationException.class,
+                        _ -> Mono.just(ResponseEntity.badRequest().build()));
     }
+
     @PutMapping("/auth/update")
-    ResponseEntity<Mono<TaskResponse>> updateTask(@Valid @RequestBody TaskUpdateRequest request, Authentication authentication) {
+    Mono<ResponseEntity<TaskResponse>> updateTask(@Valid @RequestBody TaskUpdateRequest request, Authentication authentication) {
         UUID userId = extractUserId(authentication);
-        var response = taskService.updateTask(userId, request);
-        return ResponseEntity.ok(response);
+        return taskService.updateTask(userId, request)
+                .map(ResponseEntity::ok)
+                .onErrorResume(TaskValidationException.class,
+                        _ -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
     @PatchMapping("/auth/status-change")
-    ResponseEntity<Mono<TaskResponse>> changeTaskStatus(@RequestBody Status newStatus, Authentication authentication) {
+    Mono<ResponseEntity<TaskResponse>> changeTaskStatus(@RequestBody Status newStatus, Authentication authentication) {
         UUID userId = extractUserId(authentication);
-        var response = taskService.changeStatus(userId, newStatus);
-        return ResponseEntity.ok(response);
+       return taskService.changeStatus(userId, newStatus)
+               .map(ResponseEntity::ok)
+               .onErrorResume(TaskValidationException.class,
+                       _ -> Mono.just(ResponseEntity.badRequest().build()));
+    }
+
+    @GetMapping("/auth/get/all-tasks")
+    Flux<ResponseEntity<TaskResponse>> getAllTasks() {
+            return taskService.findAllTasks()
+                    .map(ResponseEntity::ok)
+                    .onErrorResume(TaskValidationException.class,
+                            _ -> Flux.just(ResponseEntity.badRequest().build()));
     }
 
     private UUID extractUserId(Authentication authentication) {
         Jwt jwt = (Jwt) authentication.getPrincipal();
+        log.info("printing user roles and authorities: {}, {}, {}", jwt.getClaimAsString("roles"), jwt.getClaimAsString("authorities"), authentication.getAuthorities());
         return UUID.fromString(jwt.getClaimAsString("userId"));
     }
 }

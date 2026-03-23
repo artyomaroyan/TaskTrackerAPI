@@ -12,6 +12,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.tasktracker.demo.configuration.PublicEndpoints;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,10 +34,12 @@ class SecurityConfiguration {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers(PublicEndpoints.SWAGGER)
                             .permitAll()
-                        .pathMatchers("actuator")
+                        .pathMatchers("/api/v1/task/auth/actuator")
                             .permitAll()
-                        .pathMatchers("auth")
-                            .hasAnyRole("ROLE_USER", "ROLE_ADMIN")
+//                        .pathMatchers("/api/v1/task/auth/create")
+//                            .hasAnyRole("ROLE_USER", "ROLE_ADMIN")
+                        .pathMatchers("/api/v1/task/auth/create")
+                            .hasAuthority("CREATE")
                         .anyExchange()
                             .authenticated()
                 )
@@ -51,12 +54,22 @@ class SecurityConfiguration {
     protected ReactiveJwtAuthenticationConverter jwtAuthenticationConverter() {
         var converter = new ReactiveJwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
             List<String> roles = jwt.getClaimAsStringList("roles");
-            if (roles == null || roles.isEmpty()) {
-                return Flux.empty();
+            if (roles != null && !roles.isEmpty()) {
+                authorities.addAll(roles.stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                        .toList());
             }
-            return Flux.fromIterable(roles)
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role));
+
+            List<String> authoritiesList = jwt.getClaimAsStringList("authorities");
+            if (authoritiesList != null && !authorities.isEmpty()) {
+                authorities.addAll(authoritiesList.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList());
+            }
+            return Flux.fromIterable(authorities);
         });
         return converter;
     }

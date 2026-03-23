@@ -232,4 +232,20 @@ public class TaskServiceImpl implements TaskService {
 }
 
 ------------------------------------------------------------------------------------------------------------------------
+
+//    @Bean
+//    protected ReactiveJwtAuthenticationConverter jwtAuthenticationConverter() {
+//        var converter = new ReactiveJwtAuthenticationConverter();
+//        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+//            List<String> roles = jwt.getClaimAsStringList("roles");
+//            if (roles == null || roles.isEmpty()) {
+//                return Flux.empty();
+//            }
+//            return Flux.fromIterable(roles)
+//                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role));
+//        });
+//        return converter;
+//    }
+
+------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------

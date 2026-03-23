@@ -1,6 +1,5 @@
 package org.tasktracker.demo.taskservice.application.ports.in;
 
-import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.dto.TaskRequest;
 import org.tasktracker.demo.taskservice.application.dto.TaskResponse;
 import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
@@ -19,7 +18,8 @@ public interface TaskService {
     Mono<TaskResponse> createTask(TaskRequest request, UUID userId);
     Mono<TaskResponse> updateTask(UUID id, TaskUpdateRequest request);
     Mono<TaskResponse> changeStatus(UUID id, Status status);
-    Flux<TaskResponse> listUsersTasks(TaskFilter filter);
+    Flux<TaskResponse> findAllTasks();
+    Flux<TaskResponse> findAllTasksByStatus(Status status);
     Mono<TaskResponse> findTaskById(UUID id);
     Flux<TaskResponse> findTaskByAssigneeId(UUID assigneeId);
     Mono<TaskResponse> findTaskByTitle(String title);

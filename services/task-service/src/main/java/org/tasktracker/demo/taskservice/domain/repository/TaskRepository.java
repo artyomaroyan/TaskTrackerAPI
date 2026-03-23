@@ -1,7 +1,6 @@
 package org.tasktracker.demo.taskservice.domain.repository;
 
 import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
-import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.domain.model.Task;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,7 +14,10 @@ import java.util.UUID;
  */
 public interface TaskRepository {
     Mono<Task> save(Task task);
-    Flux<Task> findAllTasks(TaskFilter filter);
+    Flux<Task> findAllTasks();
+    Flux<Task> findTaskByTitle(String title);
+    Flux<Task> findTasksByFilter(TaskFilter filter);
     Mono<Task> findTaskById(UUID taskId);
+    Flux<Task> findTaskByAssigneeId(UUID assigneeId);
     Mono<Void> deleteTask(UUID id);
 }

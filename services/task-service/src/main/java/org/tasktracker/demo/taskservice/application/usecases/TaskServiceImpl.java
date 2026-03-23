@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.dto.TaskRequest;
 import org.tasktracker.demo.taskservice.application.dto.TaskResponse;
 import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
@@ -40,7 +39,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('CREATE')")
     public Mono<TaskResponse> createTask(@Valid TaskRequest request, UUID userId) {
         return validateTaskRequest(request)
                 .flatMap(_ -> createAndSaveTask(request, userId))
@@ -50,7 +49,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Mono<TaskResponse> updateTask(UUID id, TaskUpdateRequest request) {
         return taskRepository.findTaskById(id)
                 .map(task -> task.updateTask(
@@ -59,6 +58,7 @@ public class TaskServiceImpl implements TaskService {
                         request.priority(),
                         request.dueDate()
                 ))
+                .flatMap(taskRepository::save)
                 .map(taskMapper::toResponse)
                 .doOnSuccess(_ -> log.debug("Task successfully updated."))
                 .onErrorMap(DataTransactionException.class, ex ->
@@ -67,7 +67,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Mono<TaskResponse> changeStatus(UUID id, Status status) {
         return taskRepository.findTaskById(id)
                 .switchIfEmpty(Mono.error(new DataNotFoundException("Task not found:" + id)))
@@ -80,15 +80,24 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')") // also need to chack if the user who make the request is the logged-in user.
-    public Flux<TaskResponse> listUsersTasks(TaskFilter filter) {
-        return taskRepository.findAllTasks(filter)
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // also need to chack if the user who make the request is the logged-in user.
+    public Flux<TaskResponse> findAllTasks() {
+        return taskRepository.findAllTasks()
                 .map(taskMapper::toResponse)
                 .switchIfEmpty(Mono.error(new DataNotFoundException("No task was founded.")));
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')") // also need to chack if the user who make the request is the logged-in user.
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Flux<TaskResponse> findAllTasksByStatus(Status status) {
+        return taskRepository.findAllTasks()
+                .filter(task -> task.status().equals(status))
+                .map(taskMapper::toResponse)
+                .switchIfEmpty(Mono.error(new DataNotFoundException(String.format("No task was found with %s status", status))));
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_USER')") // also need to chack if the user who make the request is the logged-in user.
     public Mono<TaskResponse> findTaskById(UUID id) {
         return taskRepository.findTaskById(id)
                 .map(taskMapper::toResponse)
@@ -96,13 +105,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')") // also need to chack if the user who make the request is the logged-in user.
+    @PreAuthorize("hasRole('ROLE_USER')") // also need to chack if the user who make the request is the logged-in user.
     public Flux<TaskResponse> findTaskByAssigneeId(UUID assigneeId) {
         return null;
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Mono<TaskResponse> findTaskByTitle(String title) {
         return null;
     }
