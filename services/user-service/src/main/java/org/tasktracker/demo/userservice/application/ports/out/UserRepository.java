@@ -12,9 +12,9 @@ import java.util.UUID;
  * Time: 13:14:31
  */
 public interface UserRepository {
+    Mono<User> save(User user);
     Mono<User> findById(UUID id);
     Mono<User> findByUsername(String username);
-    Mono<User> save(User user);
     Mono<Boolean> existsByEmail(Email email);
     Mono<Void> delete(UUID id);
 }
