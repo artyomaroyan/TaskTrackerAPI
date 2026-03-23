@@ -248,4 +248,22 @@ public class TaskServiceImpl implements TaskService {
 //    }
 
 ------------------------------------------------------------------------------------------------------------------------
+
+//        return taskValidator.validate(request)
+//                .flatMap(validated -> taskRepository.findTaskById(taskId)
+//                        .switchIfEmpty(Mono.error(new DataNotFoundException(String.format(
+//                                "No task was found with %s ID:", taskId)))
+//                        )
+//                        .map(task -> task.updateTask(
+//                                validated.title(),
+//                                validated.description(),
+//                                validated.priority(),
+//                                validated.dueDate()
+//                        ))
+//                        .flatMap(taskRepository::save)
+//                        .map(taskMapper::toResponse)
+//                        .doOnSuccess(response -> log.info("Task {} successfully updated:", response.id()))
+//                        .doOnError(error -> log.error("Failed to update task: {}", taskId, error)));
+
+------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------

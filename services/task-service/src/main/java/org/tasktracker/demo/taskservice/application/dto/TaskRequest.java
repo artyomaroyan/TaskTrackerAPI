@@ -1,8 +1,6 @@
 package org.tasktracker.demo.taskservice.application.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.springframework.validation.annotation.Validated;
 import org.tasktracker.demo.taskservice.domain.model.Priority;
 
@@ -15,14 +13,15 @@ import java.time.Instant;
  */
 @Validated
 public record TaskRequest(
-        @NotBlank(message = "Task must have a title")
-        @Size(message = "Task title must be between 1 - 50 characters", min = 1, max = 50)
+        @NotBlank(message = "Title is required")
+        @Size(min = 1, max = 50, message = "Title must be between 1 and 30 characters")
+        @Pattern(regexp = "^[A-Za-z0-9\\s\\-_,.!?]+$", message = "Title contains invalid characters")
         String title,
-        @NotBlank(message = "Task must have a description")
-        @Size(message = "Task description must be between 1 - 500 characters", min = 1, max = 500)
+        @Size(max = 500, message = "Description too long")
         String description,
-        @NotNull(message = "Please select task priority!")
+        @NotNull(message = "Priority is required")
         Priority priority,
-        @NotNull(message = "Please set deadline for this task!")
+        @NotNull(message = "Due date is required")
+        @Future(message = "Due date must be in the future")
         Instant dueDate) {
 }
