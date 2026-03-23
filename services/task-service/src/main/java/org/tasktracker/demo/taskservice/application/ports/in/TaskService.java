@@ -1,8 +1,8 @@
 package org.tasktracker.demo.taskservice.application.ports.in;
 
+import org.tasktracker.demo.taskservice.application.dto.TaskFilter;
 import org.tasktracker.demo.taskservice.application.dto.TaskRequest;
 import org.tasktracker.demo.taskservice.application.dto.TaskResponse;
-import org.tasktracker.demo.taskservice.application.dto.TaskUpdateRequest;
 import org.tasktracker.demo.taskservice.domain.model.Status;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,12 +16,13 @@ import java.util.UUID;
  */
 public interface TaskService {
     Mono<TaskResponse> createTask(TaskRequest request, UUID userId);
-    Mono<TaskResponse> updateTask(UUID id, TaskUpdateRequest request);
-    Mono<TaskResponse> changeStatus(UUID id, Status status);
+    Mono<TaskResponse> updateTask(UUID taskId, UUID userId, TaskRequest request);
+    Mono<TaskResponse> changeStatus(UUID taskId, UUID userId, Status status);
     Flux<TaskResponse> findAllTasks();
-    Flux<TaskResponse> findAllTasksByStatus(Status status);
-    Mono<TaskResponse> findTaskById(UUID id);
+    Flux<TaskResponse> findAllTasksByStatus(UUID userId, Status status);
+    Mono<TaskResponse> findTaskById(UUID userId, UUID taskId);
     Flux<TaskResponse> findTaskByAssigneeId(UUID assigneeId);
-    Mono<TaskResponse> findTaskByTitle(String title);
-    Mono<Void> deleteTask(UUID id);
+    Flux<TaskResponse> findTaskByTitle(String title);
+    Flux<TaskResponse> findTaskByFilter(TaskFilter filter);
+    Mono<Void> deleteTask(UUID taskId);
 }
