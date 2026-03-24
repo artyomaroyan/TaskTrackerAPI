@@ -1,0 +1,16 @@
+package org.tasktracker.demo.task.domain.exception;
+
+/**
+ * Author: Artyom Aroyan
+ * Date: 24.12.25
+ * Time: 00:18:23
+ */
+public class DataSavingException extends RuntimeException {
+    public DataSavingException(String message) {
+        super(message);
+    }
+
+    public DataSavingException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
