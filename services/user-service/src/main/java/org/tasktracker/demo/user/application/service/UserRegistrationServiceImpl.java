@@ -1,4 +1,4 @@
-package org.tasktracker.demo.user.application.usecases;
+package org.tasktracker.demo.user.application.service;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.ValidationException;

@@ -1,4 +1,4 @@
-package org.tasktracker.demo.task.application.usecases;
+package org.tasktracker.demo.task.application.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,14 +10,14 @@ import org.tasktracker.demo.task.application.dto.TaskFilter;
 import org.tasktracker.demo.task.application.dto.TaskRequest;
 import org.tasktracker.demo.task.application.dto.TaskResponse;
 import org.tasktracker.demo.task.application.mapper.TaskMapper;
-import org.tasktracker.demo.task.application.ports.in.TaskService;
+import org.tasktracker.demo.task.application.port.in.TaskService;
 import org.tasktracker.demo.task.domain.exception.DataNotFoundException;
 import org.tasktracker.demo.task.domain.exception.DataSavingException;
 import org.tasktracker.demo.task.domain.exception.TaskValidationException;
 import org.tasktracker.demo.task.domain.model.Status;
 import org.tasktracker.demo.task.domain.model.Task;
 import org.tasktracker.demo.task.domain.model.TaskValidator;
-import org.tasktracker.demo.task.domain.repository.TaskRepository;
+import org.tasktracker.demo.task.application.port.out.TaskRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -70,22 +70,24 @@ public class TaskServiceImpl implements TaskService {
         log.info("Updating task by title: {}", request.title());
 
         return taskRepository.findTaskById(taskId)
-                .switchIfEmpty(Mono.error(new DataNotFoundException(String.format("Task not found with %s ID:", taskId))))
+                .switchIfEmpty(Mono.error(new DataNotFoundException("Task " + taskId + " not found")))
                 .flatMap(task -> {
                     if (!task.assigneeId().equals(userId)) {
                         log.warn("User {} attempted to update task {} owned by {}", userId, taskId, task.assigneeId());
                         return Mono.error(new AccessDeniedException("You do not have permission to update this task"));
                     }
+
                     if (task.status() == Status.DONE) {
-                        return Mono.error(new TaskValidationException("can not update a completed task"));
+                        return Mono.error(new TaskValidationException("Cannot update a completed task"));
                     }
 
+                    final Task updatedTask;
                     try {
-                        task.updateTask(request.title(), request.description(), request.priority(), request.dueDate());
+                        updatedTask = task.updateTask(request.title(), request.description(), request.priority(), request.dueDate());
                     } catch (IllegalArgumentException ex) {
                         return Mono.error(new TaskValidationException(ex.getMessage()));
                     }
-                    return taskRepository.save(task);
+                    return taskRepository.save(updatedTask);
                 })
                 .map(taskMapper::toResponse)
                 .doOnSuccess(_ -> log.info("Task updated successfully: {}", taskId))

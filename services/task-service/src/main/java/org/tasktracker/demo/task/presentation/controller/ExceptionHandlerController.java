@@ -1,4 +1,4 @@
-package org.tasktracker.demo.task.presentation.web;
+package org.tasktracker.demo.task.presentation.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

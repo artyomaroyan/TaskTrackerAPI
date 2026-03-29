@@ -1,4 +1,4 @@
-package org.tasktracker.demo.task.application.ports.in;
+package org.tasktracker.demo.task.application.port.in;
 
 import org.tasktracker.demo.task.application.dto.TaskFilter;
 import org.tasktracker.demo.task.application.dto.TaskRequest;

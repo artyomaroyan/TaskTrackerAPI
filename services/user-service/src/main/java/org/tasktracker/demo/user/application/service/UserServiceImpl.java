@@ -1,4 +1,4 @@
-package org.tasktracker.demo.user.application.usecases;
+package org.tasktracker.demo.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

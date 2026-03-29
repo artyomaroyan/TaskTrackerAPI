@@ -1,4 +1,4 @@
-package org.tasktracker.demo.task.presentation.web;
+package org.tasktracker.demo.task.presentation.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.tasktracker.demo.task.application.dto.TaskFilter;
 import org.tasktracker.demo.task.application.dto.TaskRequest;
 import org.tasktracker.demo.task.application.dto.TaskResponse;
-import org.tasktracker.demo.task.application.ports.in.TaskService;
+import org.tasktracker.demo.task.application.port.in.TaskService;
 import org.tasktracker.demo.task.domain.model.Status;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -78,7 +78,7 @@ public class TaskController {
     }
 
     @GetMapping("/auth/get-by-title")
-    Flux<ResponseEntity<TaskResponse>> getTaskByTitle(@RequestBody String title) {
+    Flux<ResponseEntity<TaskResponse>> getTaskByTitle(@RequestParam String title) {
         return taskService.findTaskByTitle(title)
                 .map(ResponseEntity::ok);
     }
