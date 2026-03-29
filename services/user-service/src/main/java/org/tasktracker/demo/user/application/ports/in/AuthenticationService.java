@@ -1,7 +1,7 @@
 package org.tasktracker.demo.user.application.ports.in;
 
 import jakarta.validation.constraints.NotNull;
-import org.tasktracker.demo.user.application.dto.AuthenticationRequest;
+import org.tasktracker.demo.user.application.dto.AuthRequest;
 import reactor.core.publisher.Mono;
 
 /**
@@ -10,5 +10,5 @@ import reactor.core.publisher.Mono;
  * Time: 23:49:55
  */
 public interface AuthenticationService {
-    Mono<String> login(@NotNull AuthenticationRequest request);
+    Mono<String> login(@NotNull AuthRequest request);
 }

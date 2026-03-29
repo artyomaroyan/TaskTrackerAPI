@@ -9,8 +9,4 @@ public class DataSavingException extends RuntimeException {
     public DataSavingException(String message) {
         super(message);
     }
-
-    public DataSavingException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

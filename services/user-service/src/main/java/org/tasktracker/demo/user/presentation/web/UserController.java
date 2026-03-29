@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.tasktracker.demo.user.application.dto.AuthenticationRequest;
+import org.tasktracker.demo.user.application.dto.AuthRequest;
 import org.tasktracker.demo.user.application.dto.UserRequest;
 import org.tasktracker.demo.user.application.dto.UserResponse;
 import org.tasktracker.demo.user.application.ports.in.AuthenticationService;
@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<Mono<String>> login(@Valid @RequestBody AuthenticationRequest request) {
+    ResponseEntity<Mono<String>> login(@Valid @RequestBody AuthRequest request) {
         var response = authenticationService.login(request);
         return ResponseEntity.ok(response);
     }
