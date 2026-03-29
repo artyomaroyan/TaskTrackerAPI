@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
  * Time: 23:50:52
  */
 @Validated
-public record AuthenticationRequest(
+public record AuthRequest(
         @NotBlank String username,
         @NotBlank String password
 ) {
