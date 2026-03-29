@@ -1,4 +1,4 @@
-package org.tasktracker.demo.user.application.usecases;
+package org.tasktracker.demo.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.tasktracker.demo.user.application.dto.AuthenticationRequest;
+import org.tasktracker.demo.user.application.dto.AuthRequest;
 import org.tasktracker.demo.user.application.ports.in.AuthenticationService;
 import org.tasktracker.demo.user.application.ports.out.TokenProvider;
 import org.tasktracker.demo.user.domain.model.UserIdentity;
@@ -26,7 +26,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final ReactiveUserDetailsService userDetailsService;
 
     @Override
-    public Mono<String> login(AuthenticationRequest request) {
+    public Mono<String> login(AuthRequest request) {
         return userDetailsService.findByUsername(request.username())
                 .cast(UserIdentity.class)
                 .filter(user -> passwordEncoder.matches(request.password(), user.getPassword()))

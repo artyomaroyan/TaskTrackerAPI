@@ -1,4 +1,4 @@
-package org.tasktracker.demo.user.security;
+package org.tasktracker.demo.user.infrastructure.security;
 
 import org.springframework.stereotype.Component;
 import org.tasktracker.demo.user.application.ports.out.KeyProvider;

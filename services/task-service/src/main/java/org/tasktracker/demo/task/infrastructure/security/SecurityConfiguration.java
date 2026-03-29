@@ -1,4 +1,4 @@
-package org.tasktracker.demo.task.security;
+package org.tasktracker.demo.task.infrastructure.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

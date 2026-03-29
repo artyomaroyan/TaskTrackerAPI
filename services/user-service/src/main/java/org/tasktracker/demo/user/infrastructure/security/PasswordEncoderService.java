@@ -1,4 +1,4 @@
-package org.tasktracker.demo.user.security;
+package org.tasktracker.demo.user.infrastructure.security;
 
 import jakarta.annotation.PreDestroy;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;

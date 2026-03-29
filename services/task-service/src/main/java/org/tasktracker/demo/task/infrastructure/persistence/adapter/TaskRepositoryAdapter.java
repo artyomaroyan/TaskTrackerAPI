@@ -1,4 +1,4 @@
-package org.tasktracker.demo.task.infrastructure.persistence.repository;
+package org.tasktracker.demo.task.infrastructure.persistence.adapter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,8 @@ import org.springframework.stereotype.Repository;
 import org.tasktracker.demo.task.application.dto.TaskFilter;
 import org.tasktracker.demo.task.application.mapper.TaskMapper;
 import org.tasktracker.demo.task.domain.model.Task;
-import org.tasktracker.demo.task.domain.repository.TaskRepository;
+import org.tasktracker.demo.task.application.port.out.TaskRepository;
+import org.tasktracker.demo.task.infrastructure.persistence.repository.TaskReactiveRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

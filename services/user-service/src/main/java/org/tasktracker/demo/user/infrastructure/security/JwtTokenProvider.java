@@ -1,4 +1,4 @@
-package org.tasktracker.demo.user.security;
+package org.tasktracker.demo.user.infrastructure.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

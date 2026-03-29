@@ -1,4 +1,4 @@
-package org.tasktracker.demo.user.infrastructure.persistence.repository;
+package org.tasktracker.demo.user.infrastructure.adapter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import org.tasktracker.demo.user.domain.model.User;
 import org.tasktracker.demo.user.application.ports.out.UserRepository;
 import org.tasktracker.demo.user.application.exception.DataAccessException;
 import org.tasktracker.demo.user.domain.exception.UserExistenceException;
+import org.tasktracker.demo.user.infrastructure.persistence.repository.UserReactiveRepository;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;

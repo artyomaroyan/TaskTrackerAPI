@@ -1,4 +1,4 @@
-package org.tasktracker.demo.task.domain.repository;
+package org.tasktracker.demo.task.application.port.out;
 
 import org.tasktracker.demo.task.application.dto.TaskFilter;
 import org.tasktracker.demo.task.domain.model.Task;
