@@ -48,6 +48,9 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
 
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive:4.1.0-M4")
+
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
