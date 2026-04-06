@@ -96,17 +96,41 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyAuthority('UPDATE', 'UPDATE_SELF')")
     public Mono<TaskResponse> changeStatus(UUID taskId, UUID userId, Status status) {
         log.info("prepare to update task: {}", taskId);
 
         return taskRepository.findTaskById(taskId)
                 .switchIfEmpty(Mono.error(new DataNotFoundException(String.format("No task was found with %s ID:", taskId))))
-                .map(task -> task.changeStatus(status))
-                .flatMap(taskRepository::save)
+                .flatMap(task -> {
+                    if (!task.assigneeId().equals(userId)) {
+                        log.warn("User {} attempted to update status of task {} owned by {}", userId, taskId, task.assigneeId());
+                        return Mono.error(new AccessDeniedException("You do not have permission to update this task"));
+                    }
+
+                    if (task.status().equals(status)) {
+                        return Mono.error(new TaskValidationException("Task is already on stats " + status.name()));
+                    }
+
+                    final Task updated;
+                    try {
+                        updated = task.changeStatus(status);
+                    } catch (IllegalArgumentException ex) {
+                        return Mono.error(new TaskValidationException(ex.getMessage()));
+                    }
+                    return taskRepository.save(updated);
+                })
                 .map(taskMapper::toResponse)
-                .doOnSuccess(_ -> log.info("Task {} status changed to {}", taskId, status))
+                .doOnSuccess(task -> log.info("Task status has successfully changed to - {}", task.status()))
                 .doOnError(error -> log.error("Failed to update task status: {}", taskId, error));
+
+//        return taskRepository.findTaskById(taskId)
+//                .switchIfEmpty(Mono.error(new DataNotFoundException(String.format("No task was found with %s ID:", taskId))))
+//                .map(task -> task.changeStatus(status))
+//                .flatMap(taskRepository::save)
+//                .map(taskMapper::toResponse)
+//                .doOnSuccess(_ -> log.info("Task {} status changed to {}", taskId, status))
+//                .doOnError(error -> log.error("Failed to update task status: {}", taskId, error));
     }
 
     @Override
@@ -135,7 +159,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')") // also need to chack if the user who make the request is the logged-in user.
+    @PreAuthorize("hasRole('ADMIN')")
     public Mono<TaskResponse> findTaskById(UUID userId, UUID taskId) {
         log.info("prepare to find task by ID");
 
@@ -153,7 +177,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')") // also need to chack if the user who make the request is the logged-in user.
+    @PreAuthorize("hasRole('ADMIN')")
     public Flux<TaskResponse> findTaskByAssigneeId(UUID assigneeId) {
         log.info("prepare to find task with assigneeId");
 
@@ -166,7 +190,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('READ')")
     public Flux<TaskResponse> findTaskByTitle(String title) {
         log.info("prepare to find task by title");
 
