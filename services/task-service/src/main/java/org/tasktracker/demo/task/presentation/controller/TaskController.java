@@ -51,42 +51,36 @@ public class TaskController {
     }
 
     @GetMapping("/auth/get/all-tasks")
-    Flux<ResponseEntity<TaskResponse>> getAllTasks() {
-        return taskService.findAllTasks()
-                .map(ResponseEntity::ok);
+    Flux<TaskResponse> getAllTasks() {
+        return taskService.findAllTasks();
     }
 
     @GetMapping("/auth/get-by-status")
-    Flux<ResponseEntity<TaskResponse>> getAllTasksByStatus(@RequestBody Status status, Authentication authentication) {
+    Flux<TaskResponse> getAllTasksByStatus(@RequestParam Status status, Authentication authentication) {
         var userId = extractUserId(authentication);
-        return taskService.findAllTasksByStatus(userId, status)
-                .map(ResponseEntity::ok);
+        return taskService.findAllTasksByStatus(userId, status);
     }
 
     @GetMapping("/auth/get-by-id")
-    Mono<ResponseEntity<TaskResponse>> getTaskById(@RequestBody UUID taskId, Authentication authentication) {
+    Mono<TaskResponse> getTaskById(@RequestParam UUID taskId, Authentication authentication) {
         var userId = extractUserId(authentication);
-        return taskService.findTaskById(userId, taskId)
-                .map(ResponseEntity::ok);
+        return taskService.findTaskById(userId, taskId);
     }
 
     @GetMapping("/auth/get-by-assignee-id")
-    Flux<ResponseEntity<TaskResponse>> getTasksByAssigneeId(Authentication authentication) {
+    Flux<TaskResponse> getTasksByAssigneeId(Authentication authentication) {
         var assigneeId = extractUserId(authentication);
-        return taskService.findTaskByAssigneeId(assigneeId)
-                .map(ResponseEntity::ok);
+        return taskService.findTaskByAssigneeId(assigneeId);
     }
 
     @GetMapping("/auth/get-by-title")
-    Flux<ResponseEntity<TaskResponse>> getTaskByTitle(@RequestParam String title) {
-        return taskService.findTaskByTitle(title)
-                .map(ResponseEntity::ok);
+    Flux<TaskResponse> getTaskByTitle(@RequestParam String title) {
+        return taskService.findTaskByTitle(title);
     }
 
     @GetMapping("/auth/get-by-filter")
-    Flux<ResponseEntity<TaskResponse>> getTasksByFilter(@RequestBody TaskFilter filter) {
-        return taskService.findTaskByFilter(filter)
-                .map(ResponseEntity::ok);
+    Flux<TaskResponse> getTasksByFilter(@RequestParam TaskFilter filter) {
+        return taskService.findTaskByFilter(filter);
     }
 
     @DeleteMapping("/auth/delete-by-id")
