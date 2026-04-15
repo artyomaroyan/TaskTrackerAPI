@@ -3,6 +3,8 @@ package org.tasktracker.demo.task.application.service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,6 +148,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Cacheable(value = "task", key = "#userId")
     @PreAuthorize("hasRole('ADMIN')")
     public Flux<TaskResponse> findAllTasksByStatus(UUID userId, Status status) {
         log.info("prepare to find all tasks with specified status");
@@ -159,6 +162,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Cacheable(value = "task", key = "#userId")
     @PreAuthorize("hasRole('ADMIN')")
     public Mono<TaskResponse> findTaskById(UUID userId, UUID taskId) {
         log.info("prepare to find task by ID");
@@ -177,6 +181,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Cacheable(value = "task", key = "#assigneeId")
     @PreAuthorize("hasRole('ADMIN')")
     public Flux<TaskResponse> findTaskByAssigneeId(UUID assigneeId) {
         log.info("prepare to find task with assigneeId");
@@ -190,6 +195,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Cacheable(value = "task", key = "#title")
     @PreAuthorize("hasAuthority('READ')")
     public Flux<TaskResponse> findTaskByTitle(String title) {
         log.info("prepare to find task by title");
@@ -215,6 +221,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "task", key = "taskId")
     @PreAuthorize("hasRole('ADMIN') or hasPermission('DELETE')")
     public Mono<Void> deleteTask(UUID taskId) {
         log.info("prepare to delete task with ID");
